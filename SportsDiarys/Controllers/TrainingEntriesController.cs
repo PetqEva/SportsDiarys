@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SportDiary.Services.Interfaces;
 using SportDiary.ViewModels.TrainingEntries;
 using SportsDiarys.Models;
 using SportsDiarys.ViewModels.TrainingEntries;
