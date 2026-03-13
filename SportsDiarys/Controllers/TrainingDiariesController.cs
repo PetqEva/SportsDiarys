@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SportsDiarys.Models;
+using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.TrainingDiaries;
 
 

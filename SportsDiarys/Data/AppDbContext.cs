@@ -22,15 +22,16 @@ namespace SportsDiarys.Data
 
         public virtual DbSet<Exercise> Exercises { get; set; } = null!;
 
-        /*public virtual DbSet<TrainingEntryExercise> TrainingEntryExercises { get; set; } = null!;*/
+        public virtual DbSet<TrainingEntryExercise> TrainingEntryExercises{ get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new TrainingDiaryConfiguration());
-            modelBuilder.ApplyConfiguration(new TrainingEntryConfiguration());
 
+            modelBuilder.ApplyConfiguration(new TrainingEntryConfiguration());
+            
         }
     }
 }
