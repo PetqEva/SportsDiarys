@@ -1,6 +1,6 @@
-﻿using SportDiary.ViewModels.Shared;
+﻿using SportDiary.Data.Models;
+using SportDiary.ViewModels.Shared;
 using SportDiary.ViewModels.TrainingEntries;
-using SportsDiarys.Models;
 using SportsDiarys.ViewModels.TrainingEntries;
 
 namespace SportDiary.Services.Interfaces

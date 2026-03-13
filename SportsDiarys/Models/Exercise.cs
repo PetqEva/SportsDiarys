@@ -1,5 +1,4 @@
-﻿
-using SportsDiarys.Data.Models;
+﻿using SportsDiarys.Data.Models;
 using SportsDiarys.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,11 +19,10 @@ namespace SportDiary.Data.Models
 
         public DifficultyLevel Difficulty { get; set; } = DifficultyLevel.Medium;
 
-        public ExerciseType ExerciseType { get; set; } = null!;
+        public ExerciseType Type { get; set; } = ExerciseType.Strength;
 
         public bool IsActive { get; set; } = true;
 
         public ICollection<TrainingEntryExercise> TrainingEntries { get; set; } = new List<TrainingEntryExercise>();
     }
 }
-

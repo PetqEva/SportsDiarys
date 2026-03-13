@@ -1,37 +1,62 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SportsDiarys</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SportsDiarys.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SportDiary.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SportsDiarys</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-semibold" asp-controller="Home" asp-action="Index">
+                    SportDiary
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav me-auto gap-lg-2">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="UserProfiles" asp-action="Index">Профил</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="TrainingDiaries" asp-action="Index">Дневници</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="TrainingEntries" asp-action="Index">Записи</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Calculators" asp-action="Tdee">Калкулатор</a>
+                            </li>
+                        }
                     </ul>
-                    <partial name="_LoginPartial" />
+
+                    <ul class="navbar-nav ms-auto">
+                        <partial name="_LoginPartial" />
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
+        @* ✅ Успешно съобщение (например след "Запази като дневна цел") *@
+        @if (TempData["Success"] is string msg)
+        {
+            <div class="alert alert-success mt-3 mb-3">@msg</div>
+        }
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -39,12 +64,14 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - SportsDiarys - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - SportsDiarys
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

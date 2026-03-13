@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
-using SportDiary.ViewModels.TrainingDiaries;
 using SportsDiarys.Data;
 using SportsDiarys.Models;
 using SportsDiarys.Services.Interfaces;
+using SportsDiarys.ViewModels.TrainingDiaries;
 
 namespace SportDiary.Services.Implementations
 {

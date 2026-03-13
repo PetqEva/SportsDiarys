@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SportsDiarys.Models;
+using SportDiary.Data.Models;
 using static SportsDiarys.Common.ValidationConstants;
 
 namespace SportsDiarys.Data.Configurations

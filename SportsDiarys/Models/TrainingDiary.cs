@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SportsDiarys.Data.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace SportsDiarys.Models
 {
@@ -22,7 +23,7 @@ namespace SportsDiarys.Models
 
         public int UserProfileId { get; set; }
 
-      /*  public UserProfile UserProfile { get; set; } = null!;*/
+        public UserProfile UserProfile { get; set; } = null!;
 
         public ICollection<TrainingEntry> TrainingEntries { get; set; } = new List<TrainingEntry>();
 

@@ -1,9 +1,8 @@
-﻿using SportsDiarys.Data.Models;
-using SportsDiarys.Models;
+﻿using SportsDiarys.Models;
 using System.ComponentModel.DataAnnotations;
 using static SportsDiarys.Common.ValidationConstants;
 
-namespace SportDiary.Data.Models
+namespace SportsDiarys.Data.Models
 {
     public class TrainingEntry
     {

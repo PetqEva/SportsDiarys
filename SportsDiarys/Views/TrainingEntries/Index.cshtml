@@ -1,0 +1,215 @@
+﻿@using SportDiary.ViewModels.TrainingEntries
+@using SportsDiarys.ViewModels.TrainingEntries
+@model EntriesIndexVm
+
+@{
+    ViewData["Title"] = "Записи";
+    var q = Model.Query;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+
+    string dash(string? s) => string.IsNullOrWhiteSpace(s) ? "-" : s;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h1 class="mb-0">@ViewData["Title"]</h1>
+        <div class="text-muted small mt-1">Филтрирай, сортирай и управлявай тренировъчните си записи.</div>
+    </div>
+
+    <a class="btn btn-primary" asp-action="Create">+ Нов запис</a>
+</div>
+
+<form method="get" class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+
+            <div class="col-12 col-lg-3">
+                <label class="form-label">Дневник</label>
+                <select class="form-select" name="DiaryId">
+                    <option value="" selected="@(q.DiaryId == null ? "selected" : null)">(Всички)</option>
+                    @foreach (var d in Model.Diaries)
+                    {
+                        <option value="@d.Value" selected="@(d.Selected ? "selected" : null)">@d.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label class="form-label">От</label>
+                <input class="form-control" type="date" name="From"
+                       value="@(q.From.HasValue ? q.From.Value.ToString("yyyy-MM-dd") : "")" />
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label class="form-label">До</label>
+                <input class="form-control" type="date" name="To"
+                       value="@(q.To.HasValue ? q.To.Value.ToString("yyyy-MM-dd") : "")" />
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <label class="form-label">Спорт</label>
+                <input class="form-control" name="Sport" value="@q.Sport" placeholder="напр. фитнес" />
+            </div>
+
+            <div class="col-12 col-lg-2">
+                <label class="form-label">Сортиране</label>
+                <select class="form-select" name="Sort">
+                    <option value="date_desc" selected="@(q.Sort == "date_desc" ? "selected" : null)">Дата (нови)</option>
+                    <option value="date_asc" selected="@(q.Sort == "date_asc" ? "selected" : null)">Дата (стари)</option>
+                    <option value="calories_desc" selected="@(q.Sort == "calories_desc" ? "selected" : null)">Калории (↓)</option>
+                    <option value="duration_desc" selected="@(q.Sort == "duration_desc" ? "selected" : null)">Минути (↓)</option>
+                    <option value="distance_desc" selected="@(q.Sort == "distance_desc" ? "selected" : null)">Разстояние (↓)</option>
+                </select>
+            </div>
+
+            <div class="col-12 d-flex flex-wrap gap-2 align-items-end">
+                <input type="hidden" name="Page" value="1" />
+
+                <div>
+                    <label class="form-label">На страница</label>
+                    <select class="form-select" name="PageSize">
+                        @{
+                            var sizes = new[] { 5, 10, 20, 50 };
+                        }
+                        @foreach (var s in sizes)
+                        {
+                            <option value="@s" selected="@(q.PageSize == s ? "selected" : null)">@s</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="ms-auto d-flex gap-2">
+                    <button class="btn btn-outline-primary" type="submit">Филтрирай</button>
+
+                    <!-- Clear: чисти филтрите, но пази PageSize -->
+                    <a class="btn btn-outline-secondary"
+                       href="@Url.Action("Index", new { Page = 1, PageSize = q.PageSize })">
+                        Изчисти
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@if (Model.Result.TotalCount == 0)
+{
+    <div class="alert alert-info mb-0">
+        Няма намерени записи. Натисни <strong>+ Нов запис</strong>, за да добавиш първата тренировка.
+    </div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-muted">
+            Показвам <strong>@Model.Result.Items.Count</strong> от <strong>@Model.Result.TotalCount</strong>
+        </div>
+        <div class="text-muted">
+            Страница <strong>@Model.Result.Page</strong> / <strong>@Model.Result.TotalPages</strong>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Спорт</th>
+                    <th class="text-end">Мин</th>
+                    <th class="text-end">Ккал</th>
+                    <th class="text-end">Км</th>
+                    <th>Дневник</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Result.Items)
+                {
+                    <tr>
+                        <td><span class="badge bg-dark">@item.SportName</span></td>
+                        <td class="text-end">@item.DurationMinutes</td>
+                        <td class="text-end">@item.Calories</td>
+                        <td class="text-end text-nowrap">@(item.DistanceKm.HasValue ? $"{item.DistanceKm:0.##} km" : "-")</td>
+                        <td class="text-nowrap">
+                            <span class="badge text-bg-light border">@dash(item.DiaryLabel)</span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-outline-secondary"
+                                   asp-controller="TrainingEntries"
+                                   asp-action="Details"
+                                   asp-route-id="@item.Id"
+                                   asp-route-returnUrl="@returnUrl">Детайли</a>
+
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="TrainingEntries"
+                                   asp-action="Edit"
+                                   asp-route-id="@item.Id"
+                                   asp-route-returnUrl="@returnUrl">Редакция</a>
+
+                                <a class="btn btn-sm btn-outline-danger"
+                                   asp-controller="TrainingEntries"
+                                   asp-action="Delete"
+                                   asp-route-id="@item.Id"
+                                   asp-route-returnUrl="@returnUrl">Изтриване</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Навигация по страници" class="d-flex justify-content-center">
+        <ul class="pagination mb-0">
+
+            <li class="page-item @(Model.Result.HasPrevious ? "" : "disabled")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new {
+                        DiaryId = q.DiaryId,
+                        From = q.From,
+                        To = q.To,
+                        Sport = q.Sport,
+                        Sort = q.Sort,
+                        Page = q.Page - 1,
+                        PageSize = q.PageSize
+                   })">
+                    &laquo;
+                </a>
+            </li>
+
+            @for (int p = Math.Max(1, Model.Result.Page - 2); p <= Math.Min(Model.Result.TotalPages, Model.Result.Page + 2); p++)
+            {
+                <li class="page-item @(p == Model.Result.Page ? "active" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                            DiaryId = q.DiaryId,
+                            From = q.From,
+                            To = q.To,
+                            Sport = q.Sport,
+                            Sort = q.Sort,
+                            Page = p,
+                            PageSize = q.PageSize
+                       })">
+                        @p
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(Model.Result.HasNext ? "" : "disabled")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new {
+                        DiaryId = q.DiaryId,
+                        From = q.From,
+                        To = q.To,
+                        Sport = q.Sport,
+                        Sort = q.Sort,
+                        Page = q.Page + 1,
+                        PageSize = q.PageSize
+                   })">
+                    &raquo;
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+

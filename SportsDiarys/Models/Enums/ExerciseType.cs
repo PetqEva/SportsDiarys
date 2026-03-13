@@ -1,6 +1,6 @@
 ﻿namespace SportsDiarys.Models.Enums
 {
-    public enum ExerciseTyp
+    public enum ExerciseType
     {
         Strength = 0,
         Cardio = 1,

@@ -1,0 +1,102 @@
+﻿@model IEnumerable<TrainingDiary>
+
+@{
+    ViewData["Title"] = "Дневници";
+
+    string dash(string? s) => string.IsNullOrWhiteSpace(s) ? "-" : s;
+
+    string placeText(string? p) => p switch
+    {
+        "Home" => "В къщи",
+        "Gym" => "Фитнес",
+        "Outdoor" => "Навън",
+        "Other" => "Друго",
+        _ => dash(p)
+    };
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <h1 class="mb-0">@ViewData["Title"]</h1>
+
+    <a class="btn btn-primary" asp-action="Create">+ Нов дневник</a>
+</div>
+
+<p class="text-muted mb-3">
+    Преглеждай и управлявай дневниците си по дати.
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Нямаш създадени дневници. Натисни <strong>„Нов дневник“</strong>, за да добавиш първия.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Дата</th>
+                    <th>Място</th>
+                    <th class="text-end">Мин</th>
+                    <th class="text-end">Вода</th>
+                    <th>Бележки</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderByDescending(x => x.Date))
+                {
+                    <tr>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+
+                        <td>
+                            <span class="badge
+                                @(item.Place == "Gym" ? "bg-success" :
+                                                         item.Place == "Outdoor" ? "bg-primary" :
+                                                         item.Place == "Home" ? "bg-secondary" :
+                                                         "bg-dark")">
+                                @placeText(item.Place)
+                            </span>
+                        </td>
+
+                        <td class="text-end">@item.DurationMinutes</td>
+
+                        <td class="text-end">
+                            @($"{item.WaterLiters:0.##} л")
+                        </td>
+
+                        <td>@dash(item.Notes)</td>
+
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary"
+                                   asp-action="Details" asp-route-id="@item.Id">
+                                Детайли
+                            </a>
+
+                            <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="Edit" asp-route-id="@item.Id">
+                                Редакция
+                            </a>
+
+                            <a class="btn btn-sm btn-outline-danger"
+                                   asp-action="Delete" asp-route-id="@item.Id">
+                                Изтриване
+                            </a>
+
+                            <a class="btn btn-sm btn-success"
+                                   asp-controller="TrainingEntries"
+                                   asp-action="Create"
+                                   asp-route-diaryId="@item.Id">
+                                + Запис
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+}
+

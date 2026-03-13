@@ -100,7 +100,7 @@ namespace SportDiary.Services.Implementations
             };
         }
 
-        // Business validation (не DB)
+        // Business validation 
         public IEnumerable<(string field, string message)> ValidateBusinessRules(TrainingEntryFormVm vm)
         {
             if (vm.DurationMinutes <= 0)
