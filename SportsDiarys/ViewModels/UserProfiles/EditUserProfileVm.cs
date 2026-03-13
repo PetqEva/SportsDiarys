@@ -17,7 +17,6 @@ namespace SportDiary.ViewModels.UserProfiles
         [Range(30, 300)]
         public double StartWeightKg { get; set; }
 
-        // ✅ НОВО
         [Range(30, 300)]
         public double CurrentWeightKg { get; set; }
 

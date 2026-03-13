@@ -2,7 +2,6 @@
 using SportDiary.Services.Interfaces;
 using SportDiary.ViewModels.Exercises;
 using SportsDiarys.Data;
-using SportsDiarys.Models;
 using SportsDiarys.Models.Enums;
 
 namespace SportsDiarys.Services.Implementations

@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SportsDiarys.Data.Models;
+using SportsDiarys.Models;
+using System.ComponentModel.DataAnnotations;
 using static SportsDiarys.Common.ValidationConstants;
 
-namespace SportsDiarys.Models
+namespace SportDiary.Data.Models
 {
     public class TrainingEntry
     {
@@ -24,5 +26,8 @@ namespace SportsDiarys.Models
         public int TrainingDiaryId { get; set; }
         public TrainingDiary TrainingDiary { get; set; } = null!;
 
+        public ICollection<TrainingEntryExercise> Exercises { get; set; } = new List<TrainingEntryExercise>();
+
     }
 }
+

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SportDiary.Data.Models;
 using SportsDiarys.Data.Configurations;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Models;
 
 namespace SportsDiarys.Data
@@ -12,7 +14,7 @@ namespace SportsDiarys.Data
 
         }
 
-        /* public virtual DbSet<UserProfile> UserProfiles { get; set; } = null!;*/
+        public virtual DbSet<UserProfile> UserProfiles { get; set; } = null!;
 
         public virtual DbSet<TrainingDiary> TrainingDiaries { get; set; } = null!;
 
