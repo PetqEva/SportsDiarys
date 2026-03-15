@@ -1,3 +1,8 @@
 <Solution>
+  <Project Path="SportDiary.Data.Models/SportsDiarys.Data.Models.csproj" Id="0de9b06c-9ede-4b17-b2e1-f0088dcd1974" />
+  <Project Path="SportsDiarys.Data/SportsDiarys.Data.csproj" Id="16d9282c-a7e6-4a95-9918-a90597e65133" />
+  <Project Path="SportsDiarys.GCommon/SportsDiarys.GCommon.csproj" Id="27a4b310-3191-4b46-a3f3-c47e8650ebb8" />
+  <Project Path="SportsDiarys.Services/SportsDiarys.Services.csproj" Id="c9fd6e4c-2d5d-4603-a452-cc2f69937930" />
+  <Project Path="SportsDiarys.ViewModels/SportsDiarys.ViewModels.csproj" Id="76e78a90-472a-44d2-8fbe-bf2f08a6f017" />
   <Project Path="SportsDiarys/SportsDiarys.csproj" />
 </Solution>

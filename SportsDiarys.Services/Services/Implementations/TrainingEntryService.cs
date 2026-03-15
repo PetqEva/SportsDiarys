@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SporstDiarys.ViewModels.TrainingEntries;
-using SportsDiarys.Services.Interfaces;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
+using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Shared;
 using SportsDiarys.ViewModels.TrainingEntries;
 

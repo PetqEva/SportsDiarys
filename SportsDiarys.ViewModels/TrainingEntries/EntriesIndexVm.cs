@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using SporstDiarys.ViewModels.TrainingEntries;
+﻿using SporstDiarys.ViewModels.TrainingEntries;
 using SportsDiarys.ViewModels.Shared;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SportsDiarys.ViewModels.TrainingEntries
 {

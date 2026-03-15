@@ -52,7 +52,7 @@ namespace SportsDiarys.Infrastructure
             {
                 var profile = new UserProfile
                 {
-                    IdentityUserId = admin.Id,
+                    IdentityUserId = admin.Id, // винаги валиден
                     Name = "Administrator",
                     Age = 30,
                     Gender = "Male",

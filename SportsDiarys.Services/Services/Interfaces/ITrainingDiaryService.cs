@@ -1,5 +1,5 @@
-﻿using SportsDiarys.ViewModels.TrainingDiaries;
-using SportsDiarys.Models;
+﻿using SportsDiarys.Models;
+using SportsDiarys.ViewModels.TrainingDiaries;
 
 namespace SportsDiarys.Services.Interfaces
 {

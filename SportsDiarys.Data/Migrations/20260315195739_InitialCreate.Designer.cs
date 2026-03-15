@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsDiarys.Data;
 
@@ -11,9 +12,11 @@ using SportsDiarys.Data;
 namespace SportsDiarys.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260315195739_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,6 +261,35 @@ namespace SportsDiarys.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Exercises");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Difficulty = 0,
+                            IsActive = true,
+                            MuscleGroup = "Chest",
+                            Name = "Push-Up",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Difficulty = 1,
+                            IsActive = true,
+                            MuscleGroup = "Legs",
+                            Name = "Squat",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Difficulty = 1,
+                            IsActive = true,
+                            MuscleGroup = "Core",
+                            Name = "Plank",
+                            Type = 0
+                        });
                 });
 
             modelBuilder.Entity("SportsDiarys.Data.Models.TrainingEntry", b =>

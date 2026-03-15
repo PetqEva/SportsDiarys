@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using static SportsDiarys.Common.ValidationConstants;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SportsDiarys.ViewModels.TrainingEntries
 {

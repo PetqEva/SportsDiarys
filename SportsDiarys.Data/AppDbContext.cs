@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SportsDiarys.Data.Models;
 using SportsDiarys.Data.Configurations;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Models;
+using SportsDiarys.Models.Enums;
 
 namespace SportsDiarys.Data
 {
@@ -23,9 +24,11 @@ namespace SportsDiarys.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Apply configurations
             modelBuilder.ApplyConfiguration(new TrainingDiaryConfiguration());
             modelBuilder.ApplyConfiguration(new TrainingEntryConfiguration());
 
+            // Many-to-Many: TrainingEntry <-> Exercise
             modelBuilder.Entity<TrainingEntryExercise>(entity =>
             {
                 entity.HasKey(te => new { te.TrainingEntryId, te.ExerciseId });
@@ -40,6 +43,37 @@ namespace SportsDiarys.Data
                       .HasForeignKey(te => te.ExerciseId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+            // Seed Exercises
+            modelBuilder.Entity<Exercise>().HasData(
+                new Exercise
+                {
+                    Id = 1,
+                    Name = "Push-Up",
+                    MuscleGroup = "Chest",
+                    Type = ExerciseType.Strength,
+                    Difficulty = DifficultyLevel.Easy,
+                    IsActive = true
+                },
+                new Exercise
+                {
+                    Id = 2,
+                    Name = "Squat",
+                    MuscleGroup = "Legs",
+                    Type = ExerciseType.Strength,
+                    Difficulty = DifficultyLevel.Medium,
+                    IsActive = true
+                },
+                new Exercise
+                {
+                    Id = 3,
+                    Name = "Plank",
+                    MuscleGroup = "Core",
+                    Type = ExerciseType.Strength,
+                    Difficulty = DifficultyLevel.Medium,
+                    IsActive = true
+                }
+            );
         }
     }
 }
