@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="SportDiary.Data.Models/SportsDiarys.Data.Models.csproj" Id="0de9b06c-9ede-4b17-b2e1-f0088dcd1974" />
   <Project Path="SportsDiarys.Data/SportsDiarys.Data.csproj" Id="16d9282c-a7e6-4a95-9918-a90597e65133" />
   <Project Path="SportsDiarys.GCommon/SportsDiarys.GCommon.csproj" Id="27a4b310-3191-4b46-a3f3-c47e8650ebb8" />
