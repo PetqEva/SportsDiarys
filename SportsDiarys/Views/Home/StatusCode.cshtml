@@ -1,0 +1,30 @@
+﻿@model int
+@{
+    ViewData["Title"] = $"Грешка ({Model})";
+}
+
+<div class="container py-5">
+    @if (Model == 404)
+    {
+        <h1 class="mb-3">Страницата не е намерена (404)</h1>
+        <p class="text-muted">Линкът е грешен или страницата е премахната.</p>
+    }
+    else if (Model == 403)
+    {
+        <h1 class="mb-3">Нямаш достъп (403)</h1>
+        <p class="text-muted">Нямаш права за тази страница.</p>
+    }
+    else if (Model == 401)
+    {
+        <h1 class="mb-3">Не си логната (401)</h1>
+        <p class="text-muted">Влез в профила си, за да продължиш.</p>
+    }
+    else
+    {
+        <h1 class="mb-3">Грешка (@Model)</h1>
+        <p class="text-muted">Възникна проблем при обработката на заявката.</p>
+    }
+
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Начало</a>
+</div>
+

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SportDiary.Data.Models;
-using SportDiary.Services.Interfaces;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
 
-namespace SportDiary.Controllers;
+namespace SportsDiarys.Controllers;
 
 [Authorize]
 public abstract class BaseController : Controller

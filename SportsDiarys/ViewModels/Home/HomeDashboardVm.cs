@@ -1,4 +1,4 @@
-﻿namespace SportDiary.ViewModels.Home
+﻿namespace SportsDiarys.ViewModels.Home
 {
     public class HomeDashboardVm
     {

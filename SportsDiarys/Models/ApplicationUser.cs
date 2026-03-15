@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SportsDiarys.Data.Models;
 
-namespace SportDiary.Data.Models
+namespace SportsDiarys.Data.Models
 {
     public class ApplicationUser : IdentityUser
     {

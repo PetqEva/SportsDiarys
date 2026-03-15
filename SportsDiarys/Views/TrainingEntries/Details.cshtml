@@ -1,0 +1,136 @@
+﻿@using SportsDiarys.ViewModels.TrainingEntries
+@model TrainingEntryDetailsPageVm
+@{
+    ViewData["Title"] = "Детайли";
+    var e = Model.Entry;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<dl class="row">
+    <dt class="col-sm-2">Спорт</dt>
+    <dd class="col-sm-10">@e.SportName</dd>
+
+    <dt class="col-sm-2">Мин</dt>
+    <dd class="col-sm-10">@e.DurationMinutes</dd>
+
+    <dt class="col-sm-2">Ккал</dt>
+    <dd class="col-sm-10">@e.Calories</dd>
+
+    <dt class="col-sm-2">Км</dt>
+    <dd class="col-sm-10">@(e.DistanceKm.HasValue ? $"{e.DistanceKm:0.##} km" : "-")</dd>
+
+    <dt class="col-sm-2">Дневник</dt>
+    <dd class="col-sm-10">
+        #@e.TrainingDiaryId
+        @if (!string.IsNullOrWhiteSpace(e.DiaryLabel))
+        {
+            <span>| @e.DiaryLabel</span>
+        }
+    </dd>
+</dl>
+
+<p class="mb-4">
+    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@e.Id">Редакция</a>
+    <a class="btn btn-secondary" href="@(Model.ReturnUrl ?? Url.Action("Index"))">Назад</a>
+</p>
+
+<hr />
+<h4 class="mt-4">Упражнения</h4>
+
+@if (Model.Exercises == null || !Model.Exercises.Any())
+{
+    <p class="text-muted">Няма добавени упражнения.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Упражнение</th>
+                    <th class="text-center">Серии</th>
+                    <th class="text-center">Повт.</th>
+                    <th class="text-center">Тежест (кг)</th>
+                    <th class="text-center">Време (сек)</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var x in Model.Exercises)
+                {
+                    <tr>
+                        <td>@x.Name</td>
+                        <td class="text-center">@x.Sets</td>
+                        <td class="text-center">@x.Reps</td>
+                        <td class="text-center">@(x.WeightKg.HasValue? x.WeightKg.Value.ToString("0.##") : "-")</td>
+                        <td class="text-center">@(x.DurationSeconds.HasValue? x.DurationSeconds.Value.ToString() : "-")</td>
+                        <td class="text-end">
+                            <form method="post" asp-action="RemoveExercise" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="trainingEntryId" value="@e.Id" />
+                                <input type="hidden" name="exerciseId" value="@x.ExerciseId" />
+                                <input type="hidden" name="returnUrl" value="@(Model.ReturnUrl ?? "")" />
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Махни</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<hr />
+<h4 class="mt-4">Добави упражнение</h4>
+
+<form method="post" asp-action="AddExercise" class="card card-body">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    <input type="hidden" asp-for="AddExercise.TrainingEntryId" />
+    <input type="hidden" asp-for="ReturnUrl" />
+
+    <div class="row g-2">
+        <div class="col-md-4">
+            <label class="form-label">Упражнение</label>
+            <select class="form-select"
+                    asp-for="AddExercise.ExerciseId"
+                    asp-items="Model.AddExercise.AvailableExercises">
+                <option value="">-- избери --</option>
+            </select>
+            <span asp-validation-for="AddExercise.ExerciseId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Серии</label>
+            <input class="form-control" asp-for="AddExercise.Sets" />
+            <span asp-validation-for="AddExercise.Sets" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Повт.</label>
+            <input class="form-control" asp-for="AddExercise.Reps" />
+            <span asp-validation-for="AddExercise.Reps" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Тежест (кг)</label>
+            <input class="form-control" asp-for="AddExercise.WeightKg" />
+            <span asp-validation-for="AddExercise.WeightKg" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Време (сек)</label>
+            <input class="form-control" asp-for="AddExercise.DurationSeconds" />
+            <span asp-validation-for="AddExercise.DurationSeconds" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button class="btn btn-primary" type="submit">Добави</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

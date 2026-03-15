@@ -1,0 +1,71 @@
+﻿@model IEnumerable<SportsDiarys.ViewModels.Admin.UserAdminVm>
+
+@{
+    ViewData["Title"] = "Потребители";
+}
+
+<div class="container mt-4">
+    <h1>Потребители</h1>
+    <hr />
+
+    @if (TempData["AdminError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["AdminError"]
+        </div>
+    }
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>UserName</th>
+                <th>Роля</th>
+                <th class="text-end">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Email</td>
+                    <td>@u.UserName</td>
+                    <td>
+                        @if (u.IsAdmin)
+                        {
+                            <span class="badge bg-dark">Admin</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">User</span>
+                        }
+                    </td>
+                    <td class="text-end">
+
+                        @if (!u.IsAdmin)
+                        {
+                            <form asp-action="MakeAdmin" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.Id" />
+                                <button class="btn btn-sm btn-outline-dark">
+                                    Направи Admin
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="RemoveAdmin" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.Id" />
+                                <button class="btn btn-sm btn-outline-danger">
+                                    Премахни Admin
+                                </button>
+                            </form>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

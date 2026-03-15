@@ -1,5 +1,4 @@
-﻿using SportDiary.Data.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SportsDiarys.Data.Models
 {
@@ -24,4 +23,3 @@ namespace SportsDiarys.Data.Models
         public int? DurationSeconds { get; set; } // за cardio/издръжливост
     }
 }
-

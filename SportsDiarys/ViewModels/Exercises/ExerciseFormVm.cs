@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SportDiary.ViewModels.Exercises
+namespace SporstDiarys.ViewModels.Exercises
 {
     public class ExerciseFormVm
     {

@@ -1,4 +1,4 @@
-﻿namespace SportDiary.ViewModels.Shared
+﻿namespace SportsDiarys.ViewModels.Shared
 {
     public class PagedResultVm<T>
     {

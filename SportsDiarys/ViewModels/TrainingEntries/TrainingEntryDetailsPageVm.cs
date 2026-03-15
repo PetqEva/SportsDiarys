@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using SportsDiarys.ViewModels.TrainingEntries;
 
-namespace SportDiary.ViewModels.TrainingEntries
+namespace SportsDiarys.ViewModels.TrainingEntries
 {
     public class TrainingEntryDetailsPageVm
     {

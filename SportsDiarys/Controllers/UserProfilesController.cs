@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SportDiary.Data.Models;
-using SportDiary.ViewModels.UserProfiles;
+using SportsDiarys.ViewModels.UserProfiles;
 using SportsDiarys.Services.Interfaces;
+using SportsDiarys.Data.Models;
+using SportsDiarys.Controllers;
 
 namespace SportDiary.Controllers
 {

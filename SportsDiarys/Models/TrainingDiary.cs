@@ -1,11 +1,16 @@
 ﻿using SportsDiarys.Data.Models;
 using System.ComponentModel.DataAnnotations;
+using static SportsDiarys.Common.ValidationConstants;
 
 namespace SportsDiarys.Models
 {
     public class TrainingDiary
     {
         public int Id { get; set; }
+
+        [Required]
+        [MaxLength(DiaryNameMaxLength)]
+        public string Name { get; set; } = string.Empty;
 
         public DateTime Date { get; set; }
 

@@ -25,7 +25,7 @@ namespace SportsDiarys.Data.Models
         public int TrainingDiaryId { get; set; }
         public TrainingDiary TrainingDiary { get; set; } = null!;
 
-        public ICollection<TrainingEntryExercise> Exercises { get; set; } = new List<TrainingEntryExercise>();
+        public ICollection<TrainingEntryExercise> TrainingEntryExercises { get; set; } = new List<TrainingEntryExercise>();
 
     }
 }

@@ -1,9 +1,9 @@
-﻿using SportDiary.Data.Models;
-using SportDiary.ViewModels.Shared;
-using SportDiary.ViewModels.TrainingEntries;
+﻿using SporstDiarys.ViewModels.TrainingEntries;
+using SportsDiarys.Data.Models;
+using SportsDiarys.ViewModels.Shared;
 using SportsDiarys.ViewModels.TrainingEntries;
 
-namespace SportDiary.Services.Interfaces
+namespace SportsDiarys.Services.Interfaces
 {
     public interface ITrainingEntryService
     {

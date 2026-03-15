@@ -11,6 +11,7 @@
 
         // TrainingDiary
         public const int DiaryNotesMaxLength = 500;
+        public const int DiaryNameMaxLength = 100;
 
         // TrainingEntry
         public const int SportNameMinLength = 3;

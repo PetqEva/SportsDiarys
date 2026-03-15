@@ -1,0 +1,67 @@
+﻿@using SportsDiarys.Data.Models
+@model UserProfile
+
+@{
+    ViewData["Title"] = "Изтриване на профил";
+    string dash(string? s) => string.IsNullOrWhiteSpace(s) ? "-" : s;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-danger">
+    <strong>Внимание!</strong><br />
+    Сигурна ли си, че искаш да изтриеш профила си?
+    Това действие е необратимо.
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+
+        <dl class="row mb-0">
+
+            <dt class="col-sm-4">Име</dt>
+            <dd class="col-sm-8">@dash(Model.Name)</dd>
+
+            <dt class="col-sm-4">Години</dt>
+            <dd class="col-sm-8">@Model.Age</dd>
+
+            <dt class="col-sm-4">Пол</dt>
+            <dd class="col-sm-8">
+                @(Model.Gender == "Male" ? "Мъж" :
+                                Model.Gender == "Female" ? "Жена" :
+                                dash(Model.Gender))
+            </dd>
+
+            <dt class="col-sm-4">Стартови килограми</dt>
+            <dd class="col-sm-8">@($"{Model.StartWeightKg:0.##} кг")</dd>
+
+            <dt class="col-sm-4">Текущи килограми</dt>
+            <dd class="col-sm-8">@($"{Model.CurrentWeightKg:0.##} кг")</dd>
+
+            <dt class="col-sm-4">Височина</dt>
+            <dd class="col-sm-8">@($"{Model.HeightCm} см")</dd>
+
+            <dt class="col-sm-4">Активност</dt>
+            <dd class="col-sm-8">
+                @(Model.ActivityLevel == "Low" ? "Ниска активност" :
+                                Model.ActivityLevel == "Medium" ? "Средна активност" :
+                                Model.ActivityLevel == "High" ? "Висока активност" :
+                                dash(Model.ActivityLevel))
+            </dd>
+
+        </dl>
+
+    </div>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-danger">
+        Изтрий профила
+    </button>
+
+    <a class="btn btn-secondary" asp-action="Details">
+        Отказ
+    </a>
+</form>

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static SportsDiarys.Common.ValidationConstants;
 
-namespace SportDiary.ViewModels.TrainingEntries
+namespace SportsDiarys.ViewModels.TrainingEntries
 {
     public class TrainingEntryFormViewModel
     {

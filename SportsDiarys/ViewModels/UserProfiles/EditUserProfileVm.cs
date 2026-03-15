@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace SportDiary.ViewModels.UserProfiles
+namespace SportsDiarys.ViewModels.UserProfiles
 {
     public class EditUserProfileVm
     {

@@ -1,6 +1,7 @@
-﻿using SportDiary.ViewModels.Exercises;
+﻿using SporstDiarys.ViewModels.Exercises;
+using SportsDiarys.ViewModels.Exercises;
 
-namespace SportDiary.Services.Interfaces
+namespace SportsDiarys.Services.Interfaces
 {
     public interface IExerciseService
     {

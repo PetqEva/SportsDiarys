@@ -1,4 +1,4 @@
-﻿namespace SportDiary.ViewModels.UserProfiles
+﻿namespace SportsDiarys.ViewModels.UserProfiles
 {
     public class UserProfileAllViewModel
     {

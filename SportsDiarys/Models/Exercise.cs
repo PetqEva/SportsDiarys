@@ -2,7 +2,7 @@
 using SportsDiarys.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace SportDiary.Data.Models
+namespace SportsDiarys.Data.Models
 {
     public class Exercise
     {
@@ -23,6 +23,7 @@ namespace SportDiary.Data.Models
 
         public bool IsActive { get; set; } = true;
 
-        public ICollection<TrainingEntryExercise> TrainingEntries { get; set; } = new List<TrainingEntryExercise>();
+        // Навигационно свойство към TrainingEntryExercise (много към много)
+        public ICollection<TrainingEntryExercise> TrainingEntryExercises { get; set; } = new List<TrainingEntryExercise>();
     }
 }

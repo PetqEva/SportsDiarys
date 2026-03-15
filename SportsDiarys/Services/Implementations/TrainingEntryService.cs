@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportDiary.Data.Models;
-using SportDiary.Services.Interfaces;
-using SportDiary.ViewModels.Shared;
-using SportDiary.ViewModels.TrainingEntries;
+using SporstDiarys.ViewModels.TrainingEntries;
+using SportsDiarys.Services.Interfaces;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
+using SportsDiarys.ViewModels.Shared;
 using SportsDiarys.ViewModels.TrainingEntries;
 
 
-namespace SportDiary.Services.Implementations
+namespace SportsDiarys.Services.Implementations
 {
     public class TrainingEntryService : ITrainingEntryService
     {

@@ -1,4 +1,4 @@
-﻿namespace SportDiary.ViewModels.Exercises
+﻿namespace SportsDiarys.ViewModels.Exercises
 {
     public class ExerciseListItemVm
     {

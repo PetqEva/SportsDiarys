@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace SportDiary.ViewModels.TrainingEntries
+namespace SportsDiarys.ViewModels.TrainingEntries
 {
     public class AddExerciseToEntryVm
     {

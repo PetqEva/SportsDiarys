@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using SportDiary.ViewModels.Shared;
+using SporstDiarys.ViewModels.TrainingEntries;
+using SportsDiarys.ViewModels.Shared;
 
-namespace SportDiary.ViewModels.TrainingEntries
+namespace SportsDiarys.ViewModels.TrainingEntries
 {
     public class EntriesIndexVm
     {

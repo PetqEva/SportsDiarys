@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data;
-using SportDiary.ViewModels.Home;
+using SportsDiarys.ViewModels.Home;
 using System.Security.Claims;
 
 namespace SportsDiarys.Controllers

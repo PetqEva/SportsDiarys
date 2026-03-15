@@ -1,6 +1,6 @@
-﻿using SportDiary.ViewModels.Home;
+﻿using SportsDiarys.ViewModels.Home;
 
-namespace SportDiary.Services.Interfaces
+namespace SportsDiarys.Services.Interfaces
 {
     public interface IHomeDashboardService
     {

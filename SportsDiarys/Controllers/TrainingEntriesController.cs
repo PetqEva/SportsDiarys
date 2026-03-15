@@ -2,14 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SportDiary.Data.Models;
-using SportDiary.Services.Interfaces;
-using SportDiary.ViewModels.TrainingEntries;
-using SportsDiarys.Models;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.TrainingEntries;
 
-namespace SportDiary.Controllers
+namespace SportsDiarys.Controllers
 {
     [Authorize]
     public class TrainingEntriesController : BaseController

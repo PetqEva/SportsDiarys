@@ -2,51 +2,34 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using SportDiary.Data.Models;
 using SportDiary.Services.Implementations;
-using SportDiary.Services.Interfaces;
 using SportsDiarys.Data;
+using SportsDiarys.Data.Models;
+using SportsDiarys.Infrastructure;
 using SportsDiarys.Services.Implementations;
 using SportsDiarys.Services.Interfaces;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1️⃣ Connection string
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+// 2️⃣ Add services
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddRazorPages();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddRazorPages(options =>
-{
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ForgotPassword");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResendEmailConfirmation");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ConfirmEmail");
-});
-
-// Services
-builder.Services.AddScoped<ITrainingEntryService, TrainingEntryService>();
-builder.Services.AddScoped<ITrainingDiaryService, TrainingDiaryService>();
-builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-builder.Services.AddScoped<IHomeDashboardService, HomeDashboardService>();
-builder.Services.AddScoped<IExerciseService, ExerciseService>();
-
-
-// DbContext
+// 3️⃣ Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Identity + Roles
+// 4️⃣ Add Identity
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
-
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
@@ -56,7 +39,7 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-// Всички страници изискват login по подразбиране
+// 5️⃣ Authorization
 builder.Services.AddAuthorization(options =>
 {
     options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -64,13 +47,32 @@ builder.Services.AddAuthorization(options =>
         .Build();
 });
 
+// 6️⃣ Add application services
+builder.Services.AddScoped<ITrainingEntryService, TrainingEntryService>();
+builder.Services.AddScoped<ITrainingDiaryService, TrainingDiaryService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IHomeDashboardService, HomeDashboardService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
+
 var app = builder.Build();
 
-// Seed
-/*await DbSeeder.SeedAsync(app.Services);
-await IdentitySeeder.SeedRolesAndAdminAsync(app.Services);*/
+// 7️⃣ Run migrations and seed database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<AppDbContext>();
 
-// Error handling
+    // Run pending migrations
+    dbContext.Database.Migrate();
+
+    // Seed roles, admin, userprofile
+    await IdentitySeeder.SeedRolesAndAdminAsync(services);
+
+    // Seed TrainingDiary, Exercises, TrainingEntry
+    await DbSeeder.SeedAsync(services);
+}
+
+// 8️⃣ Error handling
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -85,13 +87,8 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// Localization
-var supportedCultures = new[]
-{
-    new CultureInfo("bg-BG"),
-    new CultureInfo("en-US")
-};
-
+// 9️⃣ Localization
+var supportedCultures = new[] { new CultureInfo("bg-BG"), new CultureInfo("en-US") };
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("bg-BG"),
@@ -100,19 +97,18 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 
 app.UseRouting();
-
 app.UseAuthentication();
-/*app.UseMiddleware<ProfileBootstrapMiddleware>();*/
 app.UseAuthorization();
 
+// 10️⃣ Razor Pages
 app.MapRazorPages();
 
-// ✅ Area routing (ТРЯБВА да е преди default)
+// 11️⃣ Area routing
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
 
-// Default route
+// 12️⃣ Default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
