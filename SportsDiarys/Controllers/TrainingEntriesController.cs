@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
+using SportsDiarys.Services.Implementations;
 using SportsDiarys.ViewModels.TrainingEntries;
 
 namespace SportsDiarys.Controllers
@@ -22,13 +23,11 @@ namespace SportsDiarys.Controllers
             _entryService = entryService;
         }
 
-        private async Task<int?> GetProfileIdOrRedirectAsync()
-            => await GetMyProfileIdAsync();
+        private async Task<int?> GetProfileIdOrRedirectAsync() => await GetMyProfileIdAsync();
 
         private async Task<List<SelectListItem>> BuildMyDiariesSelectAsync(int userProfileId, int? selectedId = null)
         {
             var diaries = await _entryService.GetMyDiarySelectItemsAsync(userProfileId);
-
             return diaries.Select(d => new SelectListItem
             {
                 Value = d.Id.ToString(),
@@ -46,7 +45,6 @@ namespace SportsDiarys.Controllers
                 return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             var vm = new EntriesIndexVm
             {
                 Query = query,
@@ -64,11 +62,9 @@ namespace SportsDiarys.Controllers
             if (id == null) return NotFound();
 
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             var entry = await _entryService.GetMyEntryDetailsAsync(id.Value, pid);
             if (entry == null) return NotFound();
 
@@ -99,11 +95,9 @@ namespace SportsDiarys.Controllers
         public async Task<IActionResult> Create(int? diaryId, string? returnUrl)
         {
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             var vm = new TrainingEntryFormVm
             {
                 TrainingDiaryId = diaryId ?? 0,
@@ -119,13 +113,12 @@ namespace SportsDiarys.Controllers
         public async Task<IActionResult> Create(TrainingEntryFormVm vm)
         {
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
 
-            foreach (var (field, message) in _entryService.ValidateBusinessRules(vm))
-                ModelState.AddModelError(field, message);
+            foreach (var error in _entryService.ValidateBusinessRules(vm))
+                ModelState.AddModelError(error.Field, error.Message);
 
             if (!ModelState.IsValid)
             {
@@ -157,11 +150,9 @@ namespace SportsDiarys.Controllers
             if (id == null) return NotFound();
 
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             var entry = await _entryService.GetMyEntryForEditAsync(id.Value, pid);
             if (entry == null) return NotFound();
 
@@ -187,13 +178,12 @@ namespace SportsDiarys.Controllers
             if (id != vm.Id) return NotFound();
 
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
 
-            foreach (var (field, message) in _entryService.ValidateBusinessRules(vm))
-                ModelState.AddModelError(field, message);
+            foreach (var error in _entryService.ValidateBusinessRules(vm))
+                ModelState.AddModelError(error.Field, error.Message);
 
             if (!ModelState.IsValid)
             {
@@ -227,11 +217,9 @@ namespace SportsDiarys.Controllers
             if (id == null) return NotFound();
 
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             var entry = await _entryService.GetMyEntryDetailsAsync(id.Value, pid);
             if (entry == null) return NotFound();
 
@@ -244,11 +232,9 @@ namespace SportsDiarys.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id, string? returnUrl)
         {
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             var deleted = await _entryService.DeleteAsync(id, pid);
             if (!deleted) return NotFound();
 
@@ -258,20 +244,16 @@ namespace SportsDiarys.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ===================== EXERCISES IN ENTRY =====================
+        // ===================== EXERCISES =====================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddExercise(
-            [Bind(Prefix = "AddExercise")] AddExerciseToEntryVm model,
-            string? returnUrl)
+        public async Task<IActionResult> AddExercise([Bind(Prefix = "AddExercise")] AddExerciseToEntryVm model, string? returnUrl)
         {
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
 
-            // ако ExerciseId е int? и не е избрано
             if (model.ExerciseId is null)
                 ModelState.AddModelError("AddExercise.ExerciseId", "Избери упражнение.");
 
@@ -310,11 +292,9 @@ namespace SportsDiarys.Controllers
         public async Task<IActionResult> RemoveExercise(int trainingEntryId, int exerciseId, string? returnUrl)
         {
             var userProfileId = await GetProfileIdOrRedirectAsync();
-            if (userProfileId == null)
-                return RedirectToAction("Create", "UserProfiles");
+            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-
             await _entryService.RemoveExerciseAsync(trainingEntryId, exerciseId, pid);
 
             return RedirectToAction(nameof(Details), new { id = trainingEntryId, returnUrl });

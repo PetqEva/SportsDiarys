@@ -6,7 +6,6 @@ using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Shared;
 using SportsDiarys.ViewModels.TrainingEntries;
 
-
 namespace SportsDiarys.Services.Implementations
 {
     public class TrainingEntryService : ITrainingEntryService
@@ -18,7 +17,44 @@ namespace SportsDiarys.Services.Implementations
             _context = context;
         }
 
-        // READ: всички мои записи
+        // ===================== VALIDATION =====================
+        public class ValidationError
+        {
+            public string Field { get; set; } = null!;
+            public string Message { get; set; } = null!;
+        }
+
+        public IEnumerable<ValidationError> ValidateBusinessRules(TrainingEntryFormVm vm)
+        {
+            if (vm.DurationMinutes <= 0)
+                yield return new ValidationError { Field = nameof(vm.DurationMinutes), Message = "Продължителността трябва да е положителна." };
+
+            if (vm.DurationMinutes > 600)
+                yield return new ValidationError { Field = nameof(vm.DurationMinutes), Message = "Продължителността е нереалистично голяма." };
+
+            if (vm.Calories < 0)
+                yield return new ValidationError { Field = nameof(vm.Calories), Message = "Калориите не могат да са отрицателни." };
+
+            if (vm.Calories > vm.DurationMinutes * 40)
+                yield return new ValidationError { Field = nameof(vm.Calories), Message = "Калориите са нереалистично високи спрямо продължителността." };
+
+            if (vm.DistanceKm.HasValue)
+            {
+                if (vm.DistanceKm < 0)
+                    yield return new ValidationError { Field = nameof(vm.DistanceKm), Message = "Разстоянието не може да е отрицателно." };
+
+                if (vm.DistanceKm > 200)
+                    yield return new ValidationError { Field = nameof(vm.DistanceKm), Message = "Разстоянието е нереалистично голямо." };
+            }
+
+            if (string.IsNullOrWhiteSpace(vm.SportName))
+                yield return new ValidationError { Field = nameof(vm.SportName), Message = "Името на спорта е задължително." };
+
+            if (!string.IsNullOrWhiteSpace(vm.SportName) && vm.SportName.Length < 3)
+                yield return new ValidationError { Field = nameof(vm.SportName), Message = "Името трябва да съдържа поне 3 символа." };
+        }
+
+        // ===================== GET ENTRIES =====================
         public async Task<List<TrainingEntry>> GetMyEntriesAsync(int userProfileId)
         {
             return await _context.TrainingEntries
@@ -30,13 +66,11 @@ namespace SportsDiarys.Services.Implementations
                 .ToListAsync();
         }
 
-        // READ: paged + filtering
         public async Task<PagedResultVm<TrainingEntryAllViewModel>> GetMyEntriesPagedAsync(int userProfileId, EntriesQueryVm query)
         {
             query ??= new EntriesQueryVm();
-            if (query.Page < 1) query.Page = 1;
-            if (query.PageSize < 5) query.PageSize = 5;
-            if (query.PageSize > 50) query.PageSize = 50;
+            query.Page = Math.Max(1, query.Page);
+            query.PageSize = Math.Clamp(query.PageSize, 5, 50);
 
             var q = _context.TrainingEntries
                 .AsNoTracking()
@@ -47,22 +81,13 @@ namespace SportsDiarys.Services.Implementations
                 q = q.Where(e => e.TrainingDiaryId == query.DiaryId.Value);
 
             if (!string.IsNullOrWhiteSpace(query.Sport))
-            {
-                var sport = query.Sport.Trim();
-                q = q.Where(e => e.SportName.Contains(sport));
-            }
+                q = q.Where(e => e.SportName.Contains(query.Sport.Trim()));
 
             if (query.From.HasValue)
-            {
-                var fromDate = query.From.Value.Date;
-                q = q.Where(e => e.TrainingDiary!.Date.Date >= fromDate);
-            }
+                q = q.Where(e => e.TrainingDiary!.Date.Date >= query.From.Value.Date);
 
             if (query.To.HasValue)
-            {
-                var toDate = query.To.Value.Date;
-                q = q.Where(e => e.TrainingDiary!.Date.Date <= toDate);
-            }
+                q = q.Where(e => e.TrainingDiary!.Date.Date <= query.To.Value.Date);
 
             q = query.Sort switch
             {
@@ -74,7 +99,6 @@ namespace SportsDiarys.Services.Implementations
             };
 
             var total = await q.CountAsync();
-
             var items = await q
                 .Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
@@ -99,48 +123,14 @@ namespace SportsDiarys.Services.Implementations
             };
         }
 
-        // Business validation 
-        public IEnumerable<(string field, string message)> ValidateBusinessRules(TrainingEntryFormVm vm)
-        {
-            if (vm.DurationMinutes <= 0)
-                yield return (nameof(vm.DurationMinutes), "Продължителността трябва да е положителна.");
-
-            if (vm.DurationMinutes > 600)
-                yield return (nameof(vm.DurationMinutes), "Продължителността е нереалистично голяма.");
-
-            if (vm.Calories > vm.DurationMinutes * 40)
-                yield return (nameof(vm.Calories), "Калориите са нереалистично високи спрямо продължителността.");
-
-            if (vm.Calories < 0)
-                yield return (nameof(vm.Calories), "Калориите не могат да са отрицателни.");
-
-            if (vm.DistanceKm.HasValue)
-            {
-                if (vm.DistanceKm < 0)
-                    yield return (nameof(vm.DistanceKm), "Разстоянието не може да е отрицателно.");
-
-                if (vm.DistanceKm > 200)
-                    yield return (nameof(vm.DistanceKm), "Разстоянието е нереалистично голямо.");
-            }
-
-            if (string.IsNullOrWhiteSpace(vm.SportName))
-                yield return (nameof(vm.SportName), "Името на спорта е задължително.");
-
-            if (!string.IsNullOrWhiteSpace(vm.SportName) && vm.SportName.Length < 3)
-                yield return (nameof(vm.SportName), "Името трябва да съдържа поне 3 символа.");
-        }
-
-        // READ: Details => ViewModel (НЕ entity)
+        // ===================== GET SINGLE ENTRY =====================
         public async Task<TrainingEntryDetailsViewModel?> GetMyEntryDetailsAsync(int entryId, int userProfileId)
         {
             return await _context.TrainingEntries
                 .AsNoTracking()
                 .Include(e => e.TrainingDiary)
-                    .ThenInclude(d => d.UserProfile) // ако имаш навигация
-                .Where(e =>
-                    e.Id == entryId &&
-                    e.TrainingDiary != null &&
-                    e.TrainingDiary.UserProfileId == userProfileId)
+                    .ThenInclude(d => d.UserProfile)
+                .Where(e => e.Id == entryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId)
                 .Select(e => new TrainingEntryDetailsViewModel
                 {
                     Id = e.Id,
@@ -148,33 +138,24 @@ namespace SportsDiarys.Services.Implementations
                     DurationMinutes = e.DurationMinutes,
                     Calories = e.Calories,
                     DistanceKm = e.DistanceKm,
-
                     TrainingDiaryId = e.TrainingDiaryId,
-                    DiaryLabel = e.TrainingDiary != null
-                        ? e.TrainingDiary.Date.ToString("yyyy-MM-dd")
-                        : string.Empty,
-
-                    UserProfileId = e.TrainingDiary!.UserProfileId,
-                    UserName = e.TrainingDiary.UserProfile != null ? e.TrainingDiary.UserProfile.Name : string.Empty,
-
-                    DiaryDate = e.TrainingDiary!.Date
+                    DiaryLabel = e.TrainingDiary != null ? e.TrainingDiary.Date.ToString("yyyy-MM-dd") : string.Empty,
+                    UserProfileId = e.TrainingDiary != null ? e.TrainingDiary.UserProfileId : 0,
+                    UserName = e.TrainingDiary != null && e.TrainingDiary.UserProfile != null ? e.TrainingDiary.UserProfile.Name : string.Empty,
+                    DiaryDate = e.TrainingDiary != null ? e.TrainingDiary.Date : DateTime.MinValue
                 })
                 .FirstOrDefaultAsync();
         }
 
-        // READ: за Edit (entity)
         public async Task<TrainingEntry?> GetMyEntryForEditAsync(int entryId, int userProfileId)
         {
             return await _context.TrainingEntries
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e =>
-                    e.Id == entryId &&
-                    _context.TrainingDiaries.Any(d =>
-                        d.Id == e.TrainingDiaryId &&
-                        d.UserProfileId == userProfileId));
+                .FirstOrDefaultAsync(e => e.Id == entryId &&
+                    _context.TrainingDiaries.Any(d => d.Id == e.TrainingDiaryId && d.UserProfileId == userProfileId));
         }
 
-        // Security helper
+        // ===================== DIARY OWNERSHIP =====================
         public async Task<bool> DiaryBelongsToMeAsync(int diaryId, int userProfileId)
         {
             return await _context.TrainingDiaries
@@ -182,36 +163,30 @@ namespace SportsDiarys.Services.Implementations
                 .AnyAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
         }
 
-        // CREATE
+        // ===================== CRUD =====================
         public async Task<int> CreateAsync(TrainingEntry entry, int userProfileId)
         {
-            var diaryIsMine = await DiaryBelongsToMeAsync(entry.TrainingDiaryId, userProfileId);
-            if (!diaryIsMine)
+            if (!await DiaryBelongsToMeAsync(entry.TrainingDiaryId, userProfileId))
                 throw new UnauthorizedAccessException("Diary does not belong to the current user.");
 
             entry.SportName = (entry.SportName ?? string.Empty).Trim();
-
             _context.TrainingEntries.Add(entry);
             await _context.SaveChangesAsync();
             return entry.Id;
         }
 
-        // UPDATE
         public async Task<bool> UpdateAsync(TrainingEntry form, int userProfileId)
         {
             var entry = await _context.TrainingEntries
-                .FirstOrDefaultAsync(e =>
-                    e.Id == form.Id &&
-                    _context.TrainingDiaries.Any(d =>
-                        d.Id == e.TrainingDiaryId &&
-                        d.UserProfileId == userProfileId));
+                .FirstOrDefaultAsync(e => e.Id == form.Id &&
+                    _context.TrainingDiaries.Any(d => d.Id == e.TrainingDiaryId && d.UserProfileId == userProfileId));
 
             if (entry == null) return false;
 
             if (entry.TrainingDiaryId != form.TrainingDiaryId)
             {
-                var diaryIsMine = await DiaryBelongsToMeAsync(form.TrainingDiaryId, userProfileId);
-                if (!diaryIsMine) return false;
+                if (!await DiaryBelongsToMeAsync(form.TrainingDiaryId, userProfileId))
+                    return false;
 
                 entry.TrainingDiaryId = form.TrainingDiaryId;
             }
@@ -225,15 +200,11 @@ namespace SportsDiarys.Services.Implementations
             return true;
         }
 
-        // DELETE
         public async Task<bool> DeleteAsync(int entryId, int userProfileId)
         {
             var entry = await _context.TrainingEntries
-                .FirstOrDefaultAsync(e =>
-                    e.Id == entryId &&
-                    _context.TrainingDiaries.Any(d =>
-                        d.Id == e.TrainingDiaryId &&
-                        d.UserProfileId == userProfileId));
+                .FirstOrDefaultAsync(e => e.Id == entryId &&
+                    _context.TrainingDiaries.Any(d => d.Id == e.TrainingDiaryId && d.UserProfileId == userProfileId));
 
             if (entry == null) return false;
 
@@ -242,7 +213,7 @@ namespace SportsDiarys.Services.Implementations
             return true;
         }
 
-        // Dropdown: моите дневници
+        // ===================== DIARY DROPDOWN =====================
         public async Task<List<(int Id, string Text)>> GetMyDiarySelectItemsAsync(int userProfileId)
         {
             var diaries = await _context.TrainingDiaries
@@ -252,34 +223,29 @@ namespace SportsDiarys.Services.Implementations
                 .Select(d => new { d.Id, d.Date })
                 .ToListAsync();
 
-            return diaries
-                .Select(d => (d.Id, d.Date.ToString("dd.MM.yyyy")))
-                .ToList();
+            return diaries.Select(d => (d.Id, d.Date.ToString("dd.MM.yyyy"))).ToList();
         }
 
-        // -------- EXERCISES --------
-
+        // ===================== EXERCISES =====================
         public async Task<IEnumerable<(int Id, string Name)>> GetActiveExercisesAsync()
         {
-            return await _context.Exercises
+            var exercises = await _context.Exercises
                 .AsNoTracking()
-                .Where(x => x.IsActive)
-                .OrderBy(x => x.Name)
-                .Select(x => new ValueTuple<int, string>(x.Id, x.Name))
+                .Where(e => e.IsActive)
+                .OrderBy(e => e.Name)
+                .Select(e => new { e.Id, e.Name })
                 .ToListAsync();
+
+            return exercises.Select(e => (e.Id, e.Name));
         }
 
         public async Task<IEnumerable<EntryExerciseItemVm>> GetEntryExercisesAsync(int entryId, int userProfileId)
         {
             var isMine = await _context.TrainingEntries
                 .AsNoTracking()
-                .AnyAsync(e =>
-                    e.Id == entryId &&
-                    e.TrainingDiary != null &&
-                    e.TrainingDiary.UserProfileId == userProfileId);
+                .AnyAsync(e => e.Id == entryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
 
-            if (!isMine)
-                return Enumerable.Empty<EntryExerciseItemVm>();
+            if (!isMine) return Enumerable.Empty<EntryExerciseItemVm>();
 
             return await _context.TrainingEntryExercises
                 .AsNoTracking()
@@ -299,26 +265,22 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<bool> AddExerciseAsync(AddExerciseToEntryVm model, int userProfileId)
         {
+            if (model.ExerciseId is null) return false;
+
             var entryIsMine = await _context.TrainingEntries
-                .AnyAsync(e =>
-                    e.Id == model.TrainingEntryId &&
-                    e.TrainingDiary != null &&
-                    e.TrainingDiary.UserProfileId == userProfileId);
+                .AnyAsync(e => e.Id == model.TrainingEntryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
 
-            if (model.ExerciseId is null)
-                return false;
-
-            int exerciseId = model.ExerciseId.Value;
+            if (!entryIsMine) return false;
 
             var already = await _context.TrainingEntryExercises
-                .AnyAsync(x => x.TrainingEntryId == model.TrainingEntryId && x.ExerciseId == exerciseId);
+                .AnyAsync(x => x.TrainingEntryId == model.TrainingEntryId && x.ExerciseId == model.ExerciseId.Value);
 
             if (already) return false;
 
             _context.TrainingEntryExercises.Add(new TrainingEntryExercise
             {
                 TrainingEntryId = model.TrainingEntryId,
-                ExerciseId = exerciseId,
+                ExerciseId = model.ExerciseId.Value,
                 Sets = model.Sets,
                 Reps = model.Reps,
                 WeightKg = model.WeightKg,
@@ -332,10 +294,7 @@ namespace SportsDiarys.Services.Implementations
         public async Task<bool> RemoveExerciseAsync(int trainingEntryId, int exerciseId, int userProfileId)
         {
             var entryIsMine = await _context.TrainingEntries
-                .AnyAsync(e =>
-                    e.Id == trainingEntryId &&
-                    e.TrainingDiary != null &&
-                    e.TrainingDiary.UserProfileId == userProfileId);
+                .AnyAsync(e => e.Id == trainingEntryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
 
             if (!entryIsMine) return false;
 
