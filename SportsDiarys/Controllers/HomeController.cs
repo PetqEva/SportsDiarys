@@ -1,11 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Home;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace SportsDiarys.Controllers
 {
+ 	[AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly IHomeDashboardService _dashboardService;

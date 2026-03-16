@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
-using SportsDiarys.Services.Implementations;
 using SportsDiarys.ViewModels.TrainingEntries;
 
 namespace SportsDiarys.Controllers
@@ -38,18 +37,20 @@ namespace SportsDiarys.Controllers
 
         // ===================== INDEX =====================
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery] EntriesQueryVm query)
+        public async Task<IActionResult> Index([FromQuery] EntriesQueryVm? query)
         {
             var userProfileId = await GetProfileIdOrRedirectAsync();
             if (userProfileId == null)
                 return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
+            var safeQuery = query ?? new EntriesQueryVm();
+
             var vm = new EntriesIndexVm
             {
-                Query = query,
-                Diaries = await BuildMyDiariesSelectAsync(pid, query.DiaryId),
-                Result = await _entryService.GetMyEntriesPagedAsync(pid, query)
+                Query = safeQuery,
+                Diaries = await BuildMyDiariesSelectAsync(pid, safeQuery.DiaryId),
+                Result = await _entryService.GetMyEntriesPagedAsync(pid, safeQuery)
             };
 
             return View(vm);

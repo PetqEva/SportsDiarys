@@ -5,6 +5,9 @@ using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Shared;
 using SportsDiarys.ViewModels.TrainingEntries;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SportsDiarys.Services.Implementations
 {
@@ -18,12 +21,6 @@ namespace SportsDiarys.Services.Implementations
         }
 
         // ===================== VALIDATION =====================
-        public class ValidationError
-        {
-            public string Field { get; set; } = null!;
-            public string Message { get; set; } = null!;
-        }
-
         public IEnumerable<ValidationError> ValidateBusinessRules(TrainingEntryFormVm vm)
         {
             if (vm.DurationMinutes <= 0)
@@ -54,14 +51,70 @@ namespace SportsDiarys.Services.Implementations
                 yield return new ValidationError { Field = nameof(vm.SportName), Message = "Името трябва да съдържа поне 3 символа." };
         }
 
-        // ===================== GET ENTRIES =====================
+        // ===================== CRUD =====================
+        public async Task<int> CreateAsync(TrainingEntry entry, int userProfileId)
+        {
+            bool ownsDiary = await _context.TrainingDiaries
+                .AsNoTracking()
+                .AnyAsync(d => d.Id == entry.TrainingDiaryId && d.UserProfileId == userProfileId);
+
+            if (!ownsDiary)
+                throw new UnauthorizedAccessException("Diary does not belong to the current user.");
+
+            entry.SportName = (entry.SportName ?? string.Empty).Trim();
+            _context.TrainingEntries.Add(entry);
+            await _context.SaveChangesAsync();
+            return entry.Id;
+        }
+
+        public async Task<bool> UpdateAsync(TrainingEntry entry, int userProfileId)
+        {
+            var existing = await _context.TrainingEntries
+                .Include(e => e.TrainingDiary)
+                .FirstOrDefaultAsync(e => e.Id == entry.Id && e.TrainingDiary.UserProfileId == userProfileId);
+
+            if (existing == null)
+                return false;
+
+            existing.SportName = (entry.SportName ?? string.Empty).Trim();
+            existing.DurationMinutes = entry.DurationMinutes;
+            existing.Calories = entry.Calories;
+            existing.DistanceKm = entry.DistanceKm;
+
+            if (existing.TrainingDiaryId != entry.TrainingDiaryId)
+            {
+                bool ownsDiary = await _context.TrainingDiaries
+                    .AnyAsync(d => d.Id == entry.TrainingDiaryId && d.UserProfileId == userProfileId);
+
+                if (!ownsDiary) return false;
+
+                existing.TrainingDiaryId = entry.TrainingDiaryId;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(int entryId, int userProfileId)
+        {
+            var entry = await _context.TrainingEntries
+                .Include(e => e.TrainingDiary)
+                .FirstOrDefaultAsync(e => e.Id == entryId && e.TrainingDiary.UserProfileId == userProfileId);
+
+            if (entry == null) return false;
+
+            _context.TrainingEntries.Remove(entry);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<TrainingEntry>> GetMyEntriesAsync(int userProfileId)
         {
             return await _context.TrainingEntries
                 .AsNoTracking()
                 .Include(e => e.TrainingDiary)
-                .Where(e => e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId)
-                .OrderByDescending(e => e.TrainingDiary!.Date)
+                .Where(e => e.TrainingDiary.UserProfileId == userProfileId)
+                .OrderByDescending(e => e.TrainingDiary.Date)
                 .ThenByDescending(e => e.Id)
                 .ToListAsync();
         }
@@ -75,7 +128,7 @@ namespace SportsDiarys.Services.Implementations
             var q = _context.TrainingEntries
                 .AsNoTracking()
                 .Include(e => e.TrainingDiary)
-                .Where(e => e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
+                .Where(e => e.TrainingDiary.UserProfileId == userProfileId);
 
             if (query.DiaryId.HasValue)
                 q = q.Where(e => e.TrainingDiaryId == query.DiaryId.Value);
@@ -84,18 +137,18 @@ namespace SportsDiarys.Services.Implementations
                 q = q.Where(e => e.SportName.Contains(query.Sport.Trim()));
 
             if (query.From.HasValue)
-                q = q.Where(e => e.TrainingDiary!.Date.Date >= query.From.Value.Date);
+                q = q.Where(e => e.TrainingDiary.Date.Date >= query.From.Value.Date);
 
             if (query.To.HasValue)
-                q = q.Where(e => e.TrainingDiary!.Date.Date <= query.To.Value.Date);
+                q = q.Where(e => e.TrainingDiary.Date.Date <= query.To.Value.Date);
 
             q = query.Sort switch
             {
                 "calories_desc" => q.OrderByDescending(e => e.Calories).ThenByDescending(e => e.Id),
                 "duration_desc" => q.OrderByDescending(e => e.DurationMinutes).ThenByDescending(e => e.Id),
                 "distance_desc" => q.OrderByDescending(e => e.DistanceKm ?? 0).ThenByDescending(e => e.Id),
-                "date_asc" => q.OrderBy(e => e.TrainingDiary!.Date).ThenBy(e => e.Id),
-                _ => q.OrderByDescending(e => e.TrainingDiary!.Date).ThenByDescending(e => e.Id)
+                "date_asc" => q.OrderBy(e => e.TrainingDiary.Date).ThenBy(e => e.Id),
+                _ => q.OrderByDescending(e => e.TrainingDiary.Date).ThenByDescending(e => e.Id)
             };
 
             var total = await q.CountAsync();
@@ -110,7 +163,7 @@ namespace SportsDiarys.Services.Implementations
                     Calories = e.Calories,
                     DistanceKm = e.DistanceKm,
                     TrainingDiaryId = e.TrainingDiaryId,
-                    DiaryLabel = e.TrainingDiary != null ? e.TrainingDiary.Date.ToString("yyyy-MM-dd") : string.Empty
+                    DiaryLabel = e.TrainingDiary.Date.ToString("yyyy-MM-dd")
                 })
                 .ToListAsync();
 
@@ -123,14 +176,13 @@ namespace SportsDiarys.Services.Implementations
             };
         }
 
-        // ===================== GET SINGLE ENTRY =====================
         public async Task<TrainingEntryDetailsViewModel?> GetMyEntryDetailsAsync(int entryId, int userProfileId)
         {
             return await _context.TrainingEntries
                 .AsNoTracking()
                 .Include(e => e.TrainingDiary)
                     .ThenInclude(d => d.UserProfile)
-                .Where(e => e.Id == entryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId)
+                .Where(e => e.Id == entryId && e.TrainingDiary.UserProfileId == userProfileId)
                 .Select(e => new TrainingEntryDetailsViewModel
                 {
                     Id = e.Id,
@@ -139,10 +191,10 @@ namespace SportsDiarys.Services.Implementations
                     Calories = e.Calories,
                     DistanceKm = e.DistanceKm,
                     TrainingDiaryId = e.TrainingDiaryId,
-                    DiaryLabel = e.TrainingDiary != null ? e.TrainingDiary.Date.ToString("yyyy-MM-dd") : string.Empty,
-                    UserProfileId = e.TrainingDiary != null ? e.TrainingDiary.UserProfileId : 0,
-                    UserName = e.TrainingDiary != null && e.TrainingDiary.UserProfile != null ? e.TrainingDiary.UserProfile.Name : string.Empty,
-                    DiaryDate = e.TrainingDiary != null ? e.TrainingDiary.Date : DateTime.MinValue
+                    DiaryLabel = e.TrainingDiary.Date.ToString("yyyy-MM-dd"),
+                    UserProfileId = e.TrainingDiary.UserProfileId,
+                    UserName = e.TrainingDiary.UserProfile.Name,
+                    DiaryDate = e.TrainingDiary.Date
                 })
                 .FirstOrDefaultAsync();
         }
@@ -151,66 +203,15 @@ namespace SportsDiarys.Services.Implementations
         {
             return await _context.TrainingEntries
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == entryId &&
-                    _context.TrainingDiaries.Any(d => d.Id == e.TrainingDiaryId && d.UserProfileId == userProfileId));
+                .Include(e => e.TrainingDiary)
+                .FirstOrDefaultAsync(e => e.Id == entryId && e.TrainingDiary.UserProfileId == userProfileId);
         }
 
-        // ===================== DIARY OWNERSHIP =====================
         public async Task<bool> DiaryBelongsToMeAsync(int diaryId, int userProfileId)
         {
             return await _context.TrainingDiaries
                 .AsNoTracking()
                 .AnyAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
-        }
-
-        // ===================== CRUD =====================
-        public async Task<int> CreateAsync(TrainingEntry entry, int userProfileId)
-        {
-            if (!await DiaryBelongsToMeAsync(entry.TrainingDiaryId, userProfileId))
-                throw new UnauthorizedAccessException("Diary does not belong to the current user.");
-
-            entry.SportName = (entry.SportName ?? string.Empty).Trim();
-            _context.TrainingEntries.Add(entry);
-            await _context.SaveChangesAsync();
-            return entry.Id;
-        }
-
-        public async Task<bool> UpdateAsync(TrainingEntry form, int userProfileId)
-        {
-            var entry = await _context.TrainingEntries
-                .FirstOrDefaultAsync(e => e.Id == form.Id &&
-                    _context.TrainingDiaries.Any(d => d.Id == e.TrainingDiaryId && d.UserProfileId == userProfileId));
-
-            if (entry == null) return false;
-
-            if (entry.TrainingDiaryId != form.TrainingDiaryId)
-            {
-                if (!await DiaryBelongsToMeAsync(form.TrainingDiaryId, userProfileId))
-                    return false;
-
-                entry.TrainingDiaryId = form.TrainingDiaryId;
-            }
-
-            entry.SportName = (form.SportName ?? string.Empty).Trim();
-            entry.DurationMinutes = form.DurationMinutes;
-            entry.Calories = form.Calories;
-            entry.DistanceKm = form.DistanceKm;
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DeleteAsync(int entryId, int userProfileId)
-        {
-            var entry = await _context.TrainingEntries
-                .FirstOrDefaultAsync(e => e.Id == entryId &&
-                    _context.TrainingDiaries.Any(d => d.Id == e.TrainingDiaryId && d.UserProfileId == userProfileId));
-
-            if (entry == null) return false;
-
-            _context.TrainingEntries.Remove(entry);
-            await _context.SaveChangesAsync();
-            return true;
         }
 
         // ===================== DIARY DROPDOWN =====================
@@ -243,7 +244,7 @@ namespace SportsDiarys.Services.Implementations
         {
             var isMine = await _context.TrainingEntries
                 .AsNoTracking()
-                .AnyAsync(e => e.Id == entryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
+                .AnyAsync(e => e.Id == entryId && e.TrainingDiary.UserProfileId == userProfileId);
 
             if (!isMine) return Enumerable.Empty<EntryExerciseItemVm>();
 
@@ -268,7 +269,7 @@ namespace SportsDiarys.Services.Implementations
             if (model.ExerciseId is null) return false;
 
             var entryIsMine = await _context.TrainingEntries
-                .AnyAsync(e => e.Id == model.TrainingEntryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
+                .AnyAsync(e => e.Id == model.TrainingEntryId && e.TrainingDiary.UserProfileId == userProfileId);
 
             if (!entryIsMine) return false;
 
@@ -294,7 +295,7 @@ namespace SportsDiarys.Services.Implementations
         public async Task<bool> RemoveExerciseAsync(int trainingEntryId, int exerciseId, int userProfileId)
         {
             var entryIsMine = await _context.TrainingEntries
-                .AnyAsync(e => e.Id == trainingEntryId && e.TrainingDiary != null && e.TrainingDiary.UserProfileId == userProfileId);
+                .AnyAsync(e => e.Id == trainingEntryId && e.TrainingDiary.UserProfileId == userProfileId);
 
             if (!entryIsMine) return false;
 
