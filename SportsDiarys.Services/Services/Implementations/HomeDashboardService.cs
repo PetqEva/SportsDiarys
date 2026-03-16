@@ -2,39 +2,40 @@
 using SportsDiarys.Data;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Home;
-
+using System.Threading.Tasks;
 
 namespace SportsDiarys.Services.Implementations
 {
     public class HomeDashboardService : IHomeDashboardService
     {
         private readonly AppDbContext _context;
-        private readonly IUserProfileService _profileService;
 
-        public HomeDashboardService(AppDbContext context, IUserProfileService profileService)
+        public HomeDashboardService(AppDbContext context)
         {
             _context = context;
-            _profileService = profileService;
         }
 
-        public async Task<HomeDashboardVm> BuildAsync(string userId)
+        public async Task<HomeDashboardVm> GetDashboardAsync(string userId)
         {
-            var vm = new HomeDashboardVm
-            {
-                IsAuthenticated = true
-            };
+            var vm = new HomeDashboardVm { IsAuthenticated = true };
 
-            var profile = await _profileService.GetMyProfileAsync(userId);
+            // Вземаме профила или го създаваме, ако не съществува
+            var profile = await _context.UserProfiles
+                .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
             if (profile == null)
-                return vm;
+            {
+                profile = new UserProfile { IdentityUserId = userId };
+                _context.UserProfiles.Add(profile);
+                await _context.SaveChangesAsync();
+            }
 
+            int profileId = profile.Id;
             vm.ProfileName = profile.Name;
 
-
-            // 1) Агрегати - 1 заявка
-            var agg = await _context.TrainingDiaries
-                .Where(d => d.UserProfileId == profile.Id)
+            // Агрегати
+            var diaryStats = await _context.TrainingDiaries
+                .Where(d => d.UserProfileId == profileId)
                 .GroupBy(_ => 1)
                 .Select(g => new
                 {
@@ -45,18 +46,17 @@ namespace SportsDiarys.Services.Implementations
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-            vm.DiariesCount = agg?.DiariesCount ?? 0;
-            vm.TotalDurationMinutes = agg?.TotalDurationMinutes ?? 0;
-            vm.TotalWaterLiters = agg?.TotalWaterLiters ?? 0;
+            vm.DiariesCount = diaryStats?.DiariesCount ?? 0;
+            vm.TotalDurationMinutes = diaryStats?.TotalDurationMinutes ?? 0;
+            vm.TotalWaterLiters = diaryStats?.TotalWaterLiters ?? 0;
 
-            // EntriesCount (ако искаш и това в 1 заявка - може, но така е ясно)
+            // EntriesCount
             vm.EntriesCount = await _context.TrainingEntries
-                .Where(e => e.TrainingDiary.UserProfileId == profile.Id)
-                .CountAsync();
+                .CountAsync(e => e.TrainingDiary.UserProfileId == profileId);
 
-            // 2) Recent - 1 заявка
+            // Последни 5 дневника
             vm.RecentDiaries = await _context.TrainingDiaries
-                .Where(d => d.UserProfileId == profile.Id)
+                .Where(d => d.UserProfileId == profileId)
                 .OrderByDescending(d => d.Date)
                 .Take(5)
                 .Select(d => new HomeDashboardVm.RecentDiaryVm

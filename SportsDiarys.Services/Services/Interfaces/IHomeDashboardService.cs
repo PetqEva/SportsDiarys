@@ -1,9 +1,10 @@
 ﻿using SportsDiarys.ViewModels.Home;
+using System.Threading.Tasks;
 
 namespace SportsDiarys.Services.Interfaces
 {
     public interface IHomeDashboardService
     {
-        Task<HomeDashboardVm> BuildAsync(string userId);
+        Task<HomeDashboardVm> GetDashboardAsync(string userId);
     }
 }

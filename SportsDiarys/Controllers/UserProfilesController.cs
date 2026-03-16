@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SportsDiarys.ViewModels.UserProfiles;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Controllers;
 
-namespace SportDiary.Controllers
+namespace SportsDiarys.Controllers
 {
     [Authorize]
     public class UserProfilesController : BaseController

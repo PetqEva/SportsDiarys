@@ -1,0 +1,52 @@
+﻿@using SporstDiarys.ViewModels.Exercises
+@using SportsDiarys.ViewModels.Exercises
+@model ExerciseFormVm
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="MuscleGroup" class="form-label"></label>
+        <input asp-for="MuscleGroup" class="form-control" />
+        <span asp-validation-for="MuscleGroup" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Type</label>
+        <select asp-for="Type" class="form-select">
+            <option value="0">Strength</option>
+            <option value="1">Cardio</option>
+            <option value="2">Mobility</option>
+        </select>
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Difficulty</label>
+        <select asp-for="Difficulty" class="form-select">
+            <option value="0">Easy</option>
+            <option value="1">Medium</option>
+            <option value="2">Hard</option>
+        </select>
+        <span asp-validation-for="Difficulty" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check">
+            <input class="form-check-input" asp-for="IsActive" />
+            <label class="form-check-label" asp-for="IsActive">Active</label>
+        </div>
+    </div>
+</div>
+
+

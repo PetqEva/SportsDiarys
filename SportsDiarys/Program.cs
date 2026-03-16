@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -12,42 +11,38 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1️⃣ Connection string
+// Connection string
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// 2️⃣ Add services
+// Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// 3️⃣ Add DbContext
+// DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 4️⃣ Add Identity
+// Identity
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
+
         options.Password.RequireDigit = true;
         options.Password.RequiredLength = 6;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-// 5️⃣ Authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.DefaultPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+// Authorization
+builder.Services.AddAuthorization();
 
-// 6️⃣ Add application services
+// Application services
 builder.Services.AddScoped<ITrainingEntryService, TrainingEntryService>();
 builder.Services.AddScoped<ITrainingDiaryService, TrainingDiaryService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
@@ -56,23 +51,19 @@ builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
 var app = builder.Build();
 
-// 7️⃣ Run migrations and seed database
+// Run migrations and seed database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    // Run pending migrations
     dbContext.Database.Migrate();
 
-    // Seed roles, admin, userprofile
     await IdentitySeeder.SeedRolesAndAdminAsync(services);
-
-    // Seed TrainingDiary, Exercises, TrainingEntry
     await DbSeeder.SeedAsync(services);
 }
 
-// 8️⃣ Error handling
+// Error handling
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -87,8 +78,9 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// 9️⃣ Localization
+// Localization
 var supportedCultures = new[] { new CultureInfo("bg-BG"), new CultureInfo("en-US") };
+
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("bg-BG"),
@@ -97,18 +89,19 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 10️⃣ Razor Pages
+// Razor Pages (Identity)
 app.MapRazorPages();
 
-// 11️⃣ Area routing
+// Area routing
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
 
-// 12️⃣ Default route
+// Default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

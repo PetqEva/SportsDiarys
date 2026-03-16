@@ -1,0 +1,153 @@
+﻿@model SportsDiarys.ViewModels.Exercises.ExerciseListVm
+@using SportsDiarys.ViewModels.Exercises
+@{
+    ViewData["Title"] = "Exercises";
+    var q = ViewBag.Query as ExerciseQueryVm ?? new ExerciseQueryVm();
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Exercises</h2>
+        <a class="btn btn-primary" asp-area="Admin" asp-controller="Exercises" asp-action="Create">+ New Exercise</a>
+    </div>
+
+    <form method="get" class="card card-body mb-3">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <input class="form-control" name="Search" value="@q.Search" placeholder="Search by name..." />
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="MuscleGroup" value="@q.MuscleGroup" placeholder="Muscle group..." />
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="Type">
+                    <option value="">All types</option>
+                    <option value="0" selected="@(q.Type == 0)">Strength</option>
+                    <option value="1" selected="@(q.Type == 1)">Cardio</option>
+                    <option value="2" selected="@(q.Type == 2)">Mobility</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="Difficulty">
+                    <option value="">All levels</option>
+                    <option value="0" selected="@(q.Difficulty == 0)">Easy</option>
+                    <option value="1" selected="@(q.Difficulty == 1)">Medium</option>
+                    <option value="2" selected="@(q.Difficulty == 2)">Hard</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-primary w-100" type="submit">Filter</button>
+                <a class="btn btn-outline-secondary w-100"
+                   asp-area="Admin" asp-controller="Exercises" asp-action="Index">Reset</a>
+            </div>
+        </div>
+
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="OnlyActive" value="true" @(q.OnlyActive ? "checked" : "") />
+            <label class="form-check-label">Only active</label>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Muscle Group</th>
+                        <th>Type</th>
+                        <th>Difficulty</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No exercises found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var e in Model.Items)
+                        {
+                            <tr>
+                                <td>@e.Name</td>
+                                <td>@e.MuscleGroup</td>
+                                <td>@e.Type</td>
+                                <td>@e.Difficulty</td>
+                                <td>
+                                    @if (e.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                           asp-area="Admin" asp-controller="Exercises" asp-action="Edit" asp-route-id="@e.Id">
+                                        Edit
+                                    </a>
+
+                                    <form class="d-inline" method="post"
+                                          asp-area="Admin" asp-controller="Exercises" asp-action="ToggleActive">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@e.Id" />
+                                        <input type="hidden" name="isActive" value="@(!e.IsActive)" />
+                                        <button class="btn btn-sm btn-outline-warning" type="submit">
+                                            @(e.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Total: <strong>@Model.TotalCount</strong>
+            </div>
+
+            <nav>
+                <ul class="pagination mb-0">
+                    @{
+                        int prev = Model.CurrentPage - 1;
+                        int next = Model.CurrentPage + 1;
+
+                        string Route(int page) => Url.Action("Index", "Exercises", new
+                        {
+                            area = "Admin",
+                            Search = q.Search,
+                            MuscleGroup = q.MuscleGroup,
+                            Type = q.Type,
+                            Difficulty = q.Difficulty,
+                            OnlyActive = q.OnlyActive,
+                            Page = page,
+                            PageSize = q.PageSize
+                        })!;
+                    }
+
+                    <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link" href="@(Model.CurrentPage <= 1 ? "#" : Route(prev))">Prev</a>
+                    </li>
+
+                    <li class="page-item disabled">
+                        <span class="page-link">@Model.CurrentPage / @Model.TotalPages</span>
+                    </li>
+
+                    <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="@(Model.CurrentPage >= Model.TotalPages ? "#" : Route(next))">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
