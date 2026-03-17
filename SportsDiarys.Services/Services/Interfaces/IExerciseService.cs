@@ -1,5 +1,4 @@
-﻿using SporstDiarys.ViewModels.Exercises;
-using SportsDiarys.ViewModels.Exercises;
+﻿using SportsDiarys.ViewModels.Exercises;
 
 namespace SportsDiarys.Services.Interfaces
 {

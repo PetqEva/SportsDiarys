@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SporstDiarys.ViewModels.Exercises;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Exercises;
 
-namespace SportDiary.Areas.Admin.Controllers
+namespace SportsDiarys.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Administrator")]

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
 
-namespace SportDiary.Infrastructure
+namespace SportsDiarys.Infrastructure
 {
     public class ProfileBootstrapMiddleware
     {

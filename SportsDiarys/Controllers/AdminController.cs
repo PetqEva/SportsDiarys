@@ -8,7 +8,7 @@ using SportsDiarys.Infrastructure;
 using SportsDiarys.ViewModels.Admin;
 using System.Security.Claims;
 
-namespace SportDiary.Areas.Admin.Controllers
+namespace SportsDiarys.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = Roles.Administrator)]

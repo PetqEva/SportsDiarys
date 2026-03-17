@@ -4,7 +4,7 @@ using SportsDiarys.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.TrainingDiaries;
 
-namespace SportDiary.Services.Implementations
+namespace SportsDiarys.Services.Implementations
 {
     public class TrainingDiaryService : ITrainingDiaryService
     {

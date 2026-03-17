@@ -34,6 +34,12 @@ namespace SportsDiarys.Controllers
             return View(vm);
         }
 
+        public IActionResult StatusCodeError(int code)
+        {
+            ViewData["ErrorCode"] = code;
+            return View();
+        }
+
         public IActionResult Privacy() => View();
     }
 }

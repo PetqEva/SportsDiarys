@@ -1,6 +1,4 @@
-﻿using SportsDiarys.Data.Models;
-
-namespace SportDiary.Infrastructure
+﻿namespace SportsDiarys.Infrastructure
 {
     public static class ProfileMetricsExtensions
     {

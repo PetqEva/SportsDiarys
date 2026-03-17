@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using SportDiary.Services.Implementations;
+using SportsDiarys.Services.Implementations;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Infrastructure;
-using SportsDiarys.Services.Implementations;
 using SportsDiarys.Services.Interfaces;
 using System.Globalization;
 
@@ -71,7 +70,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseStatusCodePagesWithReExecute("/Home/StatusCodeError", "?code={0}");
     app.UseHsts();
 }
 

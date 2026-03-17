@@ -1,22 +1,20 @@
-﻿@using SporstDiarys.ViewModels.Exercises
+﻿@using SportsDiarys.ViewModels.Exercises
 @model ExerciseFormVm
-
 @{
-    ViewData["Title"] = "Edit Exercise";
+    ViewData["Title"] = "Create Exercise";
 }
 
 <div class="container mt-4">
-    <h2>Edit Exercise</h2>
+    <h2>Create Exercise</h2>
     <hr />
 
     <form method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Id" />
 
         <partial name="_ExerciseForm" model="Model" />
 
         <div class="d-flex gap-2 mt-3">
-            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-primary" type="submit">Create</button>
             <a class="btn btn-secondary" asp-area="Admin" asp-controller="Exercises" asp-action="Index">Back</a>
         </div>
     </form>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SporstDiarys.ViewModels.Exercises;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Models.Enums;

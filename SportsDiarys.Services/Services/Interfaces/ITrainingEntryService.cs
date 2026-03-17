@@ -1,5 +1,4 @@
-﻿using SporstDiarys.ViewModels.TrainingEntries;
-using SportsDiarys.Data.Models;
+﻿using SportsDiarys.Data.Models;
 using SportsDiarys.ViewModels.Shared;
 using SportsDiarys.ViewModels.TrainingEntries;
 

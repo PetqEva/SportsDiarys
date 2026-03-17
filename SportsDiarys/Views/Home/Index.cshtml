@@ -1,194 +1,59 @@
-﻿@model SportsDiarys.ViewModels.Home.HomeDashboardVm;
+﻿@model SportsDiarys.ViewModels.Home.HomeDashboardVm
 
 @{
-    ViewData["Title"] = "SportDiary";
-
-    string dash(string? s) => string.IsNullOrWhiteSpace(s) ? "-" : s;
-
-    (string text, string css) placeBadge(string? p) => p switch
-    {
-        "Home" => ("В къщи", "bg-secondary"),
-        "Gym" => ("Фитнес", "bg-success"),
-        "Outdoor" => ("Навън", "bg-primary"),
-        "Other" => ("Друго", "bg-dark"),
-        _ => ("-", "bg-dark")
-    };
+    ViewData["Title"] = "Начало";
 }
 
-<div class="container mt-3">
+<div class="text-center mb-4">
+    <h1 class="display-5 fw-bold">SportsDiarys</h1>
+    <p class="lead">Следи тренировките си, прогреса си и личните си цели.</p>
+</div>
 
-    <!-- HERO -->
-    <div class="hero-gradient rounded-4 p-4 p-lg-5 text-white shadow-sm mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-                <h1 class="display-6 fw-bold mb-1">SportDiary</h1>
+@if (!Model.IsAuthenticated)
+{
+    <div class="card shadow-sm border-0">
+        <div class="card-body text-center p-5">
+            <h2 class="h4 mb-3">Добре дошъл</h2>
+            <p class="text-muted mb-4">
+                Влез в профила си, за да видиш дневниците, тренировките и статистиката си.
+            </p>
 
-                @if (Model.IsAuthenticated)
-                {
-                    <div class="opacity-90">
-                        Здравей, <strong>@dash(Model.ProfileName)</strong> 👋
-                        <span class="opacity-75">(@dash(Model.Email))</span>
-                    </div>
-                }
-                else
-                {
-                    <div class="opacity-90">Влез, за да виждаш профила си, дневниците и статистиката.</div>
-                }
+            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary me-2">Вход</a>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary">Регистрация</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h3 class="h6 text-muted">Дневници</h3>
+                    <div class="display-6 fw-bold">@Model.DiariesCount</div>
+                </div>
             </div>
+        </div>
 
-            <div class="d-flex flex-wrap gap-2">
-                @if (Model.IsAuthenticated)
-                {
-                    <a class="btn btn-light btn-lg fw-semibold" asp-controller="UserProfiles" asp-action="Index">Профил</a>
-                    <a class="btn btn-outline-light btn-lg" asp-controller="TrainingDiaries" asp-action="Create">+ Нов дневник</a>
-                    <a class="btn btn-outline-light btn-lg" asp-controller="TrainingEntries" asp-action="Create">+ Нов запис</a>
-                }
-                else
-                {
-                    <a class="btn btn-light btn-lg fw-semibold" asp-area="Identity" asp-page="/Account/Login">Вход</a>
-                    <a class="btn btn-outline-light btn-lg" asp-area="Identity" asp-page="/Account/Register">Регистрация</a>
-                }
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h3 class="h6 text-muted">Тренировки</h3>
+                    <div class="display-6 fw-bold">@Model.EntriesCount</div>
+                </div>
             </div>
         </div>
     </div>
 
-    @if (Model.IsAuthenticated)
-    {
-        <!-- KPI -->
-        <div class="row g-3 mb-3">
-            <div class="col-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm text-white bg-primary kpi-card">
-                    <div class="card-body">
-                        <div class="opacity-75">Дневници</div>
-                        <div class="display-6 fw-bold">@Model.DiariesCount</div>
-                    </div>
-                </div>
-            </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="TrainingDiaries" asp-action="Index" class="btn btn-primary">Моите дневници</a>
+        <a asp-controller="TrainingEntries" asp-action="Index" class="btn btn-outline-primary">Моите тренировки</a>
 
-            <div class="col-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm text-white bg-success kpi-card">
-                    <div class="card-body">
-                        <div class="opacity-75">Записи</div>
-                        <div class="display-6 fw-bold">@Model.EntriesCount</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm text-white bg-warning kpi-card">
-                    <div class="card-body">
-                        <div class="opacity-75">Общо минути</div>
-                        <div class="display-6 fw-bold">@Model.TotalDurationMinutes</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm text-white bg-info kpi-card">
-                    <div class="card-body">
-                        <div class="opacity-75">Общо вода (л)</div>
-                        <div class="display-6 fw-bold">@Model.TotalWaterLiters.ToString("0.#")</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTENT -->
-        <div class="row g-3">
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <h5 class="mb-0">Последни дневници</h5>
-                            <a asp-controller="TrainingDiaries" asp-action="Index" class="btn btn-sm btn-outline-secondary">
-                                Всички
-                            </a>
-                        </div>
-
-                        @if (Model.RecentDiaries?.Any() == true)
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-sm table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Дата</th>
-                                            <th>Място</th>
-                                            <th class="text-end">Минути</th>
-                                            <th class="text-end">Вода</th>
-                                            <th class="text-end"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var d in Model.RecentDiaries)
-                                        {
-                                            var b = placeBadge(d.Place);
-
-                                            <tr>
-                                                <td class="text-nowrap">@d.Date.ToString("yyyy-MM-dd")</td>
-                                                <td><span class="badge @b.css">@b.text</span></td>
-                                                <td class="text-end">@d.DurationMinutes</td>
-                                                <td class="text-end text-nowrap">@($"{d.WaterLiters:0.#} л")</td>
-                                                <td class="text-end">
-                                                    <a class="link-clean"
-                                                       asp-controller="TrainingDiaries"
-                                                       asp-action="Details"
-                                                       asp-route-id="@d.Id">Детайли</a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-muted">Нямаш дневници още. Направи първия.</div>
-                            <a class="btn btn-primary mt-2" asp-controller="TrainingDiaries" asp-action="Create">+ Нов дневник</a>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="mb-3">Бързи действия</h5>
-
-                        <div class="d-grid gap-2">
-                            <a class="btn btn-outline-primary" asp-controller="UserProfiles" asp-action="Index">Профил</a>
-                            <a class="btn btn-outline-success" asp-controller="TrainingDiaries" asp-action="Create">Добави дневник</a>
-                            <a class="btn btn-outline-warning" asp-controller="TrainingEntries" asp-action="Create">Добави запис</a>
-                            <a class="btn btn-outline-secondary" asp-controller="TrainingDiaries" asp-action="Index">Преглед дневници</a>
-                            <a class="btn btn-outline-secondary" asp-controller="TrainingEntries" asp-action="Index">Преглед записи</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
-
-
-<style>
-    .hero-gradient {
-        background: linear-gradient(135deg, #0f172a, #1e3a8a);
-    }
-
-    .kpi-card,
-    .card {
-        border-radius: 16px;
-    }
-
-    .btn {
-        border-radius: 12px;
-    }
-
-    .link-clean {
-        text-decoration: none;
-    }
-
-        .link-clean:hover {
-            text-decoration: underline;
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-area="Admin" asp-controller="Exercises" asp-action="Index" class="btn btn-outline-secondary">Упражнения</a>
         }
 
-</style>
+        <a asp-controller="Calculators" asp-action="Tdee" class="btn btn-outline-dark">TDEE калкулатор</a>
+    </div>
+}

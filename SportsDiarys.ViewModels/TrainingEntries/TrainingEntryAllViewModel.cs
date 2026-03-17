@@ -1,4 +1,4 @@
-﻿namespace SporstDiarys.ViewModels.TrainingEntries
+﻿namespace SportsDiarys.ViewModels.TrainingEntries
 {
     public class TrainingEntryAllViewModel
     {
