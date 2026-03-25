@@ -4,7 +4,7 @@ using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Exercises;
 using SportsDiarys.Infrastructure;
 
-namespace SportsDiarys.Controllers
+namespace SportsDiarys.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = Roles.Administrator)]

@@ -1,0 +1,60 @@
+﻿@model SportsDiarys.ViewModels.TrainingDiaries.UpdateTrainingDiaryViewModel
+
+@{
+    ViewData["Title"] = "Редакция на дневник";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit" method="post">
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label"></label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Place" class="form-label"></label>
+        <select asp-for="Place" asp-items="Model.PlaceOptions" class="form-select"></select>
+        <span asp-validation-for="Place" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DurationMinutes" class="form-label"></label>
+        <input asp-for="DurationMinutes" class="form-control" />
+        <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Calories" class="form-label"></label>
+        <input asp-for="Calories" class="form-control" />
+        <span asp-validation-for="Calories" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DistanceKm" class="form-label"></label>
+        <input asp-for="DistanceKm" class="form-control" />
+        <span asp-validation-for="DistanceKm" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WaterLiters" class="form-label"></label>
+        <input asp-for="WaterLiters" class="form-control" />
+        <span asp-validation-for="WaterLiters" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Запази</button>
+    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
