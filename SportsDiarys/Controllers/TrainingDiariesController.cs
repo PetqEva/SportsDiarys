@@ -3,228 +3,214 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.TrainingDiaries;
-
 
 namespace SportsDiarys.Controllers
 {
     [Authorize]
     public class TrainingDiariesController : BaseController
     {
-        private readonly ITrainingDiaryService _diaryService;
+        private readonly ITrainingDiaryService _service;
 
         public TrainingDiariesController(
-            ITrainingDiaryService diaryService,
-            IUserProfileService profileService,
-            UserManager<ApplicationUser> userManager)
-            : base(userManager, profileService)
+            ITrainingDiaryService service,
+            UserManager<ApplicationUser> userManager,
+            IUserProfileService userProfileService)
+            : base(userManager, userProfileService)
         {
-            _diaryService = diaryService;
+            _service = service;
         }
 
-        private static List<SelectListItem> BuildPlaceOptions() => new()
-        {
-            new SelectListItem { Value = "Home", Text = "В къщи" },
-            new SelectListItem { Value = "Gym", Text = "Фитнес" },
-            new SelectListItem { Value = "Outdoor", Text = "Навън" },
-            new SelectListItem { Value = "Other", Text = "Друго" }
-        };
-
-        // GET: TrainingDiaries
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, int page = 1)
         {
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
+            {
+                return RedirectToAction("Create", "UserProfiles");
+            }
 
-            var diaries = await _diaryService.GetMyDiariesAsync(userProfileId.Value);
-            return View(diaries);
+            var result = await _service.GetMyDiariesAsync(profileId.Value, search, page, 5);
+            return View(result);
         }
 
-        // GET: TrainingDiaries/Details/5
         [HttpGet]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
+            {
+                return RedirectToAction("Create", "UserProfiles");
+            }
 
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
+            var diary = await _service.GetByIdAsync(id, profileId.Value);
 
-            var diary = await _diaryService.GetMyDiaryDetailsVmAsync(id.Value, userProfileId.Value);
-            if (diary == null) return NotFound();
+            if (diary == null)
+            {
+                return NotFound();
+            }
 
             return View(diary);
         }
 
-        // GET: TrainingDiaries/Create
         [HttpGet]
         public IActionResult Create()
         {
-            var vm = new TrainingDiaryFormVm
+            var model = new CreateTrainingDiaryViewModel
             {
-                Date = DateTime.Today,
-                PlaceOptions = BuildPlaceOptions()
+                Date = DateTime.Now,
+                PlaceOptions = GetPlaceOptions()
             };
 
-            return View(vm);
+            return View(model);
         }
 
-        // POST: TrainingDiaries/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TrainingDiaryFormVm vm)
+        public async Task<IActionResult> Create(CreateTrainingDiaryViewModel model)
         {
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
-
-            var pid = userProfileId.Value;
-
-            var allowed = new[] { "Home", "Gym", "Outdoor", "Other" };
-            if (!allowed.Contains(vm.Place))
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
             {
-                ModelState.AddModelError(nameof(vm.Place), "Невалидно място.");
+                return RedirectToAction("Create", "UserProfiles");
             }
 
             if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty, "Моля, коригирайте грешките във формата.");
-
-                vm.PlaceOptions = BuildPlaceOptions();
-                return View(vm);
+                model.PlaceOptions = GetPlaceOptions();
+                return View(model);
             }
 
+            bool exists = await _service.ExistsForDateAsync(profileId.Value, model.Date);
 
-            var exists = await _diaryService.DiaryExistsForDateAsync(pid, vm.Date);
             if (exists)
             {
-                ModelState.AddModelError(nameof(vm.Date), "Вече има дневник за тази дата.");
-                vm.PlaceOptions = BuildPlaceOptions();
-                return View(vm);
+                ModelState.AddModelError(string.Empty, "Вече има дневник за тази дата.");
+                model.PlaceOptions = GetPlaceOptions();
+                return View(model);
             }
 
-            var entity = new TrainingDiary
-            {
-                UserProfileId = pid,
-                Date = vm.Date,
-                DurationMinutes = vm.DurationMinutes,
-                Place = vm.Place,
-                WaterLiters = vm.WaterLiters,
-                Notes = vm.Notes
-            };
+            await _service.CreateAsync(model, profileId.Value);
 
-            await _diaryService.CreateAsync(entity, pid);
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: TrainingDiaries/Edit/5
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
+            {
+                return RedirectToAction("Create", "UserProfiles");
+            }
 
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
+            var diary = await _service.GetForEditAsync(id, profileId.Value);
 
-            var pid = userProfileId.Value;
+            if (diary == null)
+            {
+                return NotFound();
+            }
 
-            var diary = await _diaryService.GetMyDiaryForEditAsync(id.Value, pid);
-            if (diary == null) return NotFound();
-
-            var vm = new TrainingDiaryFormVm
+            var model = new UpdateTrainingDiaryViewModel
             {
                 Id = diary.Id,
                 Date = diary.Date,
-                DurationMinutes = diary.DurationMinutes,
-                Place = diary.Place,
-                WaterLiters = diary.WaterLiters,
                 Notes = diary.Notes,
-                PlaceOptions = BuildPlaceOptions()
+                Calories = diary.Calories,
+                DurationMinutes = diary.DurationMinutes,
+                DistanceKm = diary.DistanceKm,
+                WaterLiters = diary.WaterLiters,
+                Place = diary.Place,
+                PlaceOptions = GetPlaceOptions()
             };
 
-            return View(vm);
+            return View(model);
         }
 
-        // POST: TrainingDiaries/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TrainingDiaryFormVm vm)
+        public async Task<IActionResult> Edit(UpdateTrainingDiaryViewModel model)
         {
-            if (id != vm.Id) return NotFound();
-
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
-
-            var pid = userProfileId.Value;
-
-            var allowed = BuildPlaceOptions().Select(x => x.Value);
-
-            if (!allowed.Contains(vm.Place))
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
             {
-                ModelState.AddModelError(nameof(vm.Place), "Невалидно място.");
+                return RedirectToAction("Create", "UserProfiles");
             }
 
             if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty, "Моля, коригирайте грешките във формата.");
-
-                vm.PlaceOptions = BuildPlaceOptions();
-                return View(vm);
+                model.PlaceOptions = GetPlaceOptions();
+                return View(model);
             }
 
+            bool exists = await _service.ExistsForDateAsync(profileId.Value, model.Date, model.Id);
 
-            var exists = await _diaryService.DiaryExistsForDateAsync(pid, vm.Date, excludeDiaryId: vm.Id);
             if (exists)
             {
-                ModelState.AddModelError(nameof(vm.Date), "Вече има дневник за тази дата.");
-                vm.PlaceOptions = BuildPlaceOptions();
-                return View(vm);
+                ModelState.AddModelError(string.Empty, "Вече има дневник за тази дата.");
+                model.PlaceOptions = GetPlaceOptions();
+                return View(model);
             }
 
-            var updated = await _diaryService.UpdateAsync(
-                vm.Id,
-                pid,
-                vm.Date,
-                vm.DurationMinutes,
-                vm.Place,
-                vm.WaterLiters,
-                vm.Notes
-            );
+            bool success = await _service.UpdateAsync(model, profileId.Value);
 
-            if (!updated) return NotFound();
+            if (!success)
+            {
+                return NotFound();
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: TrainingDiaries/Delete/5
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return NotFound();
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
+            {
+                return RedirectToAction("Create", "UserProfiles");
+            }
 
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
+            var diary = await _service.GetByIdAsync(id, profileId.Value);
 
-            var diary = await _diaryService.GetMyDiaryDetailsVmAsync(id.Value, userProfileId.Value);
-            if (diary == null) return NotFound();
+            if (diary == null)
+            {
+                return NotFound();
+            }
 
             return View(diary);
         }
 
-        // POST: TrainingDiaries/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userProfileId = await GetMyProfileIdAsync();
-            if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
+            var profileId = await GetMyProfileIdAsync();
+            if (profileId == null)
+            {
+                return RedirectToAction("Create", "UserProfiles");
+            }
 
-            var deleted = await _diaryService.DeleteAsync(id, userProfileId.Value);
-            if (!deleted) return NotFound();
+            bool success = await _service.DeleteAsync(id, profileId.Value);
+
+            if (!success)
+            {
+                return NotFound();
+            }
 
             return RedirectToAction(nameof(Index));
         }
+
+        private IEnumerable<SelectListItem> GetPlaceOptions()
+        {
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Home", Text = "В къщи" },
+                new SelectListItem { Value = "Gym", Text = "Фитнес" },
+                new SelectListItem { Value = "Outdoor", Text = "Навън" },
+                new SelectListItem { Value = "Other", Text = "Друго" }
+            };
+        }
     }
 }
-

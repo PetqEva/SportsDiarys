@@ -6,21 +6,22 @@ using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Infrastructure;
 using SportsDiarys.ViewModels.Admin;
-using System.Security.Claims;
 
-namespace SportsDiarys.Controllers
+namespace SportsDiarys.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = Roles.Administrator)]
     public class AdminController : Controller
     {
+        private readonly AppDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AppDbContext _context;
 
-        public AdminController(UserManager<ApplicationUser> userManager, AppDbContext context)
+        public AdminController(
+            AppDbContext dbContext,
+            UserManager<ApplicationUser> userManager)
         {
+            _dbContext = dbContext;
             _userManager = userManager;
-            _context = context;
         }
 
         [HttpGet]
@@ -28,9 +29,9 @@ namespace SportsDiarys.Controllers
         {
             var model = new AdminDashboardVm
             {
-                UsersCount = await _userManager.Users.CountAsync(),
-                DiariesCount = await _context.TrainingDiaries.CountAsync(),
-                EntriesCount = await _context.TrainingEntries.CountAsync()
+                UsersCount = await _dbContext.Users.CountAsync(),
+                DiariesCount = await _dbContext.TrainingDiaries.CountAsync(),
+                EntriesCount = await _dbContext.TrainingEntries.CountAsync()
             };
 
             return View(model);
@@ -39,7 +40,9 @@ namespace SportsDiarys.Controllers
         [HttpGet]
         public async Task<IActionResult> Users()
         {
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _dbContext.Users
+                .OrderBy(u => u.Email)
+                .ToListAsync();
 
             var model = new List<UserAdminVm>();
 
@@ -48,9 +51,9 @@ namespace SportsDiarys.Controllers
                 model.Add(new UserAdminVm
                 {
                     Id = user.Id,
-                    Email = user.Email,
-                    UserName = user.UserName,
-                    IsAdmin = await _userManager.IsInRoleAsync(user, Roles.Administrator)
+                    Email = user.Email ?? string.Empty,
+                    UserName = user.UserName ?? string.Empty,
+                    IsAdministrator = await _userManager.IsInRoleAsync(user, Roles.Administrator)
                 });
             }
 
@@ -59,14 +62,13 @@ namespace SportsDiarys.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MakeAdmin(string userId)
+        public async Task<IActionResult> Promote(string id)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-                return BadRequest();
-
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
+            {
                 return NotFound();
+            }
 
             if (!await _userManager.IsInRoleAsync(user, Roles.Administrator))
             {
@@ -82,23 +84,13 @@ namespace SportsDiarys.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveAdmin(string userId)
+        public async Task<IActionResult> Demote(string id)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-                return BadRequest();
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // не позволявай да си махнеш Administrator на себе си
-            if (userId == currentUserId)
-            {
-                TempData["AdminError"] = "Не можеш да махнеш Administrator роля на собствения си акаунт.";
-                return RedirectToAction(nameof(Users));
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
+            {
                 return NotFound();
+            }
 
             if (await _userManager.IsInRoleAsync(user, Roles.Administrator))
             {
@@ -113,4 +105,3 @@ namespace SportsDiarys.Controllers
         }
     }
 }
-

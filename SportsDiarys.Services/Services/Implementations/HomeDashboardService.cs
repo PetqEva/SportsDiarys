@@ -2,7 +2,6 @@
 using SportsDiarys.Data;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Home;
-using System.Threading.Tasks;
 
 namespace SportsDiarys.Services.Implementations
 {
@@ -19,42 +18,42 @@ namespace SportsDiarys.Services.Implementations
         {
             var vm = new HomeDashboardVm { IsAuthenticated = true };
 
-            // Вземаме профила или го създаваме, ако не съществува
+            // ===================== PROFILE =====================
             var profile = await _context.UserProfiles
                 .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
             if (profile == null)
             {
-                profile = new UserProfile { IdentityUserId = userId };
+                profile = new UserProfile
+                {
+                    IdentityUserId = userId,
+                    Name = "New User"
+                };
+
                 _context.UserProfiles.Add(profile);
                 await _context.SaveChangesAsync();
             }
 
             int profileId = profile.Id;
-            vm.ProfileName = profile.Name;
+            vm.ProfileName = profile.Name ?? "";
 
-            // Агрегати
-            var diaryStats = await _context.TrainingDiaries
+            // ===================== STATS (FIXED) =====================
+            var diaries = await _context.TrainingDiaries
                 .Where(d => d.UserProfileId == profileId)
-                .GroupBy(_ => 1)
-                .Select(g => new
-                {
-                    DiariesCount = g.Count(),
-                    TotalDurationMinutes = g.Sum(x => (int?)x.DurationMinutes) ?? 0,
-                    TotalWaterLiters = g.Sum(x => (double?)x.WaterLiters) ?? 0
-                })
                 .AsNoTracking()
-                .FirstOrDefaultAsync();
+                .ToListAsync();
 
-            vm.DiariesCount = diaryStats?.DiariesCount ?? 0;
-            vm.TotalDurationMinutes = diaryStats?.TotalDurationMinutes ?? 0;
-            vm.TotalWaterLiters = diaryStats?.TotalWaterLiters ?? 0;
+            vm.DiariesCount = diaries.Count;
 
-            // EntriesCount
+            vm.TotalDurationMinutes = diaries.Sum(d => d.DurationMinutes);
+
+            vm.TotalWaterLiters = diaries.Sum(d => d.WaterLiters);
+
+            // ===================== ENTRIES COUNT =====================
             vm.EntriesCount = await _context.TrainingEntries
                 .CountAsync(e => e.TrainingDiary.UserProfileId == profileId);
 
-            // Последни 5 дневника
+            // ===================== RECENT DIARIES =====================
             vm.RecentDiaries = await _context.TrainingDiaries
                 .Where(d => d.UserProfileId == profileId)
                 .OrderByDescending(d => d.Date)
@@ -66,7 +65,7 @@ namespace SportsDiarys.Services.Implementations
                     Place = d.Place,
                     DurationMinutes = d.DurationMinutes,
                     WaterLiters = d.WaterLiters,
-                    Notes = d.Notes
+                    Notes = d.Notes ?? ""
                 })
                 .AsNoTracking()
                 .ToListAsync();

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<SportsDiarys.ViewModels.Admin.UserAdminVm>
+
+<h1 class="mb-4">Потребители</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Админ</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.UserName</td>
+                <td>@(user.IsAdministrator ? "Да" : "Не")</td>
+                <td>
+                    @if (!user.IsAdministrator)
+                    {
+                        <form asp-action="Promote" method="post">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <button class="btn btn-success btn-sm">Направи админ</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="Demote" method="post">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <button class="btn btn-danger btn-sm">Махни админ</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

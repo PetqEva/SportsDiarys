@@ -8,7 +8,7 @@ using SportsDiarys.Data;
 
 #nullable disable
 
-namespace SportsDiarys.Migrations
+namespace SportsDiarys.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -356,8 +356,14 @@ namespace SportsDiarys.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Calories")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("DistanceKm")
+                        .HasColumnType("float");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
@@ -383,8 +389,7 @@ namespace SportsDiarys.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserProfileId", "Date")
-                        .IsUnique();
+                    b.HasIndex("UserProfileId");
 
                     b.ToTable("TrainingDiaries");
                 });
@@ -501,7 +506,7 @@ namespace SportsDiarys.Migrations
                     b.HasOne("SportsDiarys.Data.Models.Exercise", "Exercise")
                         .WithMany("TrainingEntryExercises")
                         .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SportsDiarys.Data.Models.TrainingEntry", "TrainingEntry")

@@ -10,134 +10,157 @@ namespace SportsDiarys.Services.Implementations
     {
         private readonly AppDbContext _context;
 
-        // Централно allowed values (същите като в контролера)
-        private static readonly HashSet<string> AllowedPlaces =
-            new(StringComparer.OrdinalIgnoreCase) { "Home", "Gym", "Outdoor", "Other" };
-
         public TrainingDiaryService(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<TrainingDiary>> GetMyDiariesAsync(int userProfileId)
+        public async Task<TrainingDiaryListVm> GetMyDiariesAsync(int userProfileId, string? search, int page, int pageSize)
         {
-            return await _context.TrainingDiaries
-                .Where(d => d.UserProfileId == userProfileId)
-                .Include(d => d.TrainingEntries)
-                .AsNoTracking()
-                .OrderByDescending(d => d.Date)
-                .ToListAsync();
-        }
-
-
-        public async Task<TrainingDiary?> GetMyDiaryDetailsAsync(int diaryId, int userProfileId)
-        {
-            return await _context.TrainingDiaries
-                .AsNoTracking()
-                .Include(d => d.TrainingEntries)
-                .FirstOrDefaultAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
-        }
-
-        public async Task<TrainingDiaryDetailsViewModel?> GetMyDiaryDetailsVmAsync(int diaryId, int userProfileId)
-        {
-            var diary = await _context.TrainingDiaries
-                .AsNoTracking()
-                .Include(d => d.UserProfile)
-                .Include(d => d.TrainingEntries)
-                .FirstOrDefaultAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
-
-            if (diary == null) return null;
-
-            var entries = diary.TrainingEntries
-                .OrderByDescending(e => e.Id)
-                .Select(e => new TrainingDiaryDetailsViewModel.EntryItem
-                {
-                    Id = e.Id,
-                    SportName = e.SportName,
-                    DurationMinutes = e.DurationMinutes,
-                    Calories = e.Calories,
-                    DistanceKm = e.DistanceKm
-                })
-                .ToList();
-
-            return new TrainingDiaryDetailsViewModel
+            if (page < 1)
             {
-                Id = diary.Id,
-                Date = diary.Date,
-                Notes = diary.Notes,
+                page = 1;
+            }
 
-                UserProfileId = diary.UserProfileId,
-                UserName = diary.UserProfile?.Name ?? string.Empty,
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
 
-                Entries = entries,
+            IQueryable<TrainingDiary> query = _context.TrainingDiaries
+                .AsNoTracking()
+                .Where(d => d.UserProfileId == userProfileId);
 
-                TotalEntries = entries.Count,
-                TotalDurationMinutes = entries.Sum(x => x.DurationMinutes),
-                TotalCalories = entries.Sum(x => x.Calories),
-                TotalDistanceKm = Math.Round(entries.Sum(x => x.DistanceKm ?? 0), 2)
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                string normalizedSearch = search.Trim();
+
+                query = query.Where(d =>
+                    (d.Name != null && d.Name.Contains(normalizedSearch)) ||
+                    (d.Notes != null && d.Notes.Contains(normalizedSearch)) ||
+                    (d.Place != null && d.Place.Contains(normalizedSearch)));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            List<TrainingDiaryListItemVm> diaries = await query
+                .OrderByDescending(d => d.Date)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(d => new TrainingDiaryListItemVm
+                {
+                    Id = d.Id,
+                    Date = d.Date,
+                    Place = d.Place,
+                    DurationMinutes = d.DurationMinutes,
+                    WaterLiters = d.WaterLiters,
+                    Notes = d.Notes
+                })
+                .ToListAsync();
+
+            return new TrainingDiaryListVm
+            {
+                Items = diaries,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Search = search
             };
         }
 
-        public async Task<TrainingDiary?> GetMyDiaryForEditAsync(int diaryId, int userProfileId)
+        public async Task<TrainingDiaryDetailsViewModel?> GetByIdAsync(int diaryId, int userProfileId)
         {
-            return await _context.TrainingDiaries
+            TrainingDiary? diary = await _context.TrainingDiaries
+                .Include(d => d.UserProfile)
+                .Include(d => d.TrainingEntries)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
+
+            if (diary == null)
+            {
+                return null;
+            }
+
+            return MapToDetailsViewModel(diary);
         }
 
-        public async Task<bool> DiaryExistsForDateAsync(int userProfileId, DateTime date, int? excludeDiaryId = null)
+        public async Task<EditTrainingDiaryViewModel?> GetForEditAsync(int diaryId, int userProfileId)
         {
-            var targetDate = date.Date;
-
-            return await _context.TrainingDiaries
+            TrainingDiary? diary = await _context.TrainingDiaries
                 .AsNoTracking()
-                .AnyAsync(d =>
-                    d.UserProfileId == userProfileId &&
-                    d.Date.Date == targetDate &&
-                    (!excludeDiaryId.HasValue || d.Id != excludeDiaryId.Value));
+                .FirstOrDefaultAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
+
+            if (diary == null)
+            {
+                return null;
+            }
+
+            return new EditTrainingDiaryViewModel
+            {
+                Id = diary.Id,
+                Date = diary.Date,
+                Notes = diary.Notes ?? string.Empty,
+                Calories = diary.Calories,
+                DurationMinutes = diary.DurationMinutes,
+                DistanceKm = diary.DistanceKm,
+                WaterLiters = diary.WaterLiters,
+                Place = diary.Place ?? string.Empty
+            };
         }
 
-        // ✅ Ownership enforced here (do NOT trust incoming diary.UserProfileId)
-        public async Task<int> CreateAsync(TrainingDiary diary, int userProfileId)
+        public async Task<bool> ExistsForDateAsync(int userProfileId, DateTime date, int? excludeDiaryId = null)
         {
-            if (diary == null) throw new ArgumentNullException(nameof(diary));
+            IQueryable<TrainingDiary> query = _context.TrainingDiaries
+                .AsNoTracking()
+                .Where(d => d.UserProfileId == userProfileId && d.Date.Date == date.Date);
 
-            // enforce owner
-            diary.UserProfileId = userProfileId;
+            if (excludeDiaryId.HasValue)
+            {
+                query = query.Where(d => d.Id != excludeDiaryId.Value);
+            }
 
-            // optional hardening: validate Place
-            if (!AllowedPlaces.Contains(diary.Place))
-                throw new ArgumentException("Invalid Place value.", nameof(diary.Place));
+            return await query.AnyAsync();
+        }
 
-            _context.TrainingDiaries.Add(diary);
+        public async Task<int> CreateAsync(CreateTrainingDiaryViewModel model, int userProfileId)
+        {
+            TrainingDiary diary = new TrainingDiary
+            {
+                Name = $"Дневник {model.Date:dd.MM.yyyy}",
+                Date = model.Date,
+                Notes = model.Notes ?? string.Empty,
+                UserProfileId = userProfileId,
+                Calories = model.Calories,
+                DurationMinutes = model.DurationMinutes,
+                DistanceKm = model.DistanceKm,
+                WaterLiters = model.WaterLiters,
+                Place = model.Place ?? string.Empty
+            };
+
+            await _context.TrainingDiaries.AddAsync(diary);
             await _context.SaveChangesAsync();
 
             return diary.Id;
         }
 
-        public async Task<bool> UpdateAsync(
-            int diaryId,
-            int userProfileId,
-            DateTime date,
-            int durationMinutes,
-            string place,
-            double waterLiters,
-            string? notes)
+        public async Task<bool> UpdateAsync(UpdateTrainingDiaryViewModel model, int userProfileId)
         {
-            var diary = await _context.TrainingDiaries
-                .FirstOrDefaultAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
+            TrainingDiary? diary = await _context.TrainingDiaries
+                .FirstOrDefaultAsync(d => d.Id == model.Id && d.UserProfileId == userProfileId);
 
-            if (diary == null) return false;
-
-            // optional hardening: validate Place
-            if (!AllowedPlaces.Contains(place))
+            if (diary == null)
+            {
                 return false;
+            }
 
-            diary.Date = date;
-            diary.DurationMinutes = durationMinutes;
-            diary.Place = place;
-            diary.WaterLiters = waterLiters;
-            diary.Notes = notes;
+            diary.Name = $"Дневник {model.Date:dd.MM.yyyy}";
+            diary.Date = model.Date;
+            diary.Notes = model.Notes ?? string.Empty;
+            diary.Calories = model.Calories;
+            diary.DurationMinutes = model.DurationMinutes;
+            diary.DistanceKm = model.DistanceKm;
+            diary.WaterLiters = model.WaterLiters;
+            diary.Place = model.Place ?? string.Empty;
 
             await _context.SaveChangesAsync();
             return true;
@@ -145,16 +168,46 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<bool> DeleteAsync(int diaryId, int userProfileId)
         {
-            var diary = await _context.TrainingDiaries
-                .Include(d => d.TrainingEntries)
+            TrainingDiary? diary = await _context.TrainingDiaries
                 .FirstOrDefaultAsync(d => d.Id == diaryId && d.UserProfileId == userProfileId);
 
-            if (diary == null) return false;
+            if (diary == null)
+            {
+                return false;
+            }
 
             _context.TrainingDiaries.Remove(diary);
             await _context.SaveChangesAsync();
+
             return true;
+        }
+
+        private static TrainingDiaryDetailsViewModel MapToDetailsViewModel(TrainingDiary diary)
+        {
+            List<TrainingDiaryDetailsViewModel.EntryItem> entries = diary.TrainingEntries
+                .Select(e => new TrainingDiaryDetailsViewModel.EntryItem
+                {
+                    Id = e.Id,
+                    SportName = e.SportName ?? string.Empty,
+                    DurationMinutes = e.DurationMinutes,
+                    Calories = e.Calories,
+                    DistanceKm = e.DistanceKm ?? 0.0
+                })
+                .ToList();
+
+            return new TrainingDiaryDetailsViewModel
+            {
+                Id = diary.Id,
+                Date = diary.Date,
+                Notes = diary.Notes ?? string.Empty,
+                UserProfileId = diary.UserProfileId,
+                UserName = diary.UserProfile?.Name ?? string.Empty,
+                Entries = entries,
+                TotalEntries = entries.Count,
+                TotalCalories = entries.Sum(x => x.Calories),
+                TotalDurationMinutes = entries.Sum(x => x.DurationMinutes),
+                TotalDistanceKm = entries.Sum(x => x.DistanceKm)
+            };
         }
     }
 }
-

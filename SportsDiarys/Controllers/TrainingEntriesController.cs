@@ -12,7 +12,7 @@ namespace SportsDiarys.Controllers
     public class TrainingEntriesController : BaseController
     {
         private readonly ITrainingEntryService _entryService;
-
+        
         public TrainingEntriesController(
             ITrainingEntryService entryService,
             IUserProfileService profileService,

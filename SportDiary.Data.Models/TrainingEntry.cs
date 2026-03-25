@@ -19,14 +19,20 @@ namespace SportsDiarys.Data.Models
         public int Calories { get; set; }
 
         [Range(0, 50)]
-        public double? DistanceKm { get; set; }
+        public double? DistanceKm { get; set; } 
 
+        // ========================
+        // Relation към TrainingDiary
+        // ========================
         [Required]
         public int TrainingDiaryId { get; set; }
+
         public TrainingDiary TrainingDiary { get; set; } = null!;
 
-        public ICollection<TrainingEntryExercise> TrainingEntryExercises { get; set; } = new List<TrainingEntryExercise>();
-
+        // ========================
+        // Many-to-Many с Exercise
+        // ========================
+        public ICollection<TrainingEntryExercise> TrainingEntryExercises { get; set; }
+            = new List<TrainingEntryExercise>();
     }
 }
-

@@ -4,8 +4,8 @@
     {
         public bool IsAuthenticated { get; set; }
 
-        public string? Email { get; set; }
-        public string? ProfileName { get; set; }
+        public string Email { get; set; } = null!;
+        public string ProfileName { get; set; } = null!;
 
         public int DiariesCount { get; set; }
         public int EntriesCount { get; set; }
@@ -18,10 +18,10 @@
         {
             public int Id { get; set; }
             public DateTime Date { get; set; }
-            public string? Place { get; set; }
+            public string Place { get; set; } = null!;
             public int DurationMinutes { get; set; }
             public double WaterLiters { get; set; }
-            public string? Notes { get; set; }
+            public string Notes { get; set; } = null!;
         }
     }
 }

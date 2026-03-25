@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TrainingDiary>
+﻿@model SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryListVm
 
 @{
     ViewData["Title"] = "Дневници";
@@ -13,6 +13,8 @@
         "Other" => "Друго",
         _ => dash(p)
     };
+
+    var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
@@ -25,7 +27,7 @@
     Преглеждай и управлявай дневниците си по дати.
 </p>
 
-@if (!Model.Any())
+@if (Model.Items == null || !Model.Items.Any())
 {
     <div class="alert alert-info">
         Нямаш създадени дневници. Натисни <strong>„Нов дневник“</strong>, за да добавиш първия.
@@ -46,7 +48,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.OrderByDescending(x => x.Date))
+                @foreach (var item in Model.Items.OrderByDescending(x => x.Date))
                 {
                     <tr>
                         <td>@item.Date.ToString("yyyy-MM-dd")</td>
@@ -54,9 +56,9 @@ else
                         <td>
                             <span class="badge
                                 @(item.Place == "Gym" ? "bg-success" :
-                                                         item.Place == "Outdoor" ? "bg-primary" :
-                                                         item.Place == "Home" ? "bg-secondary" :
-                                                         "bg-dark")">
+                                 item.Place == "Outdoor" ? "bg-primary" :
+                                 item.Place == "Home" ? "bg-secondary" :
+                                                             "bg-dark")">
                                 @placeText(item.Place)
                             </span>
                         </td>
@@ -71,17 +73,20 @@ else
 
                         <td class="text-end">
                             <a class="btn btn-sm btn-outline-secondary"
-                                   asp-action="Details" asp-route-id="@item.Id">
+                                   asp-action="Details"
+                                   asp-route-id="@item.Id">
                                 Детайли
                             </a>
 
                             <a class="btn btn-sm btn-outline-primary"
-                                   asp-action="Edit" asp-route-id="@item.Id">
+                                   asp-action="Edit"
+                                   asp-route-id="@item.Id">
                                 Редакция
                             </a>
 
                             <a class="btn btn-sm btn-outline-danger"
-                                   asp-action="Delete" asp-route-id="@item.Id">
+                                   asp-action="Delete"
+                                   asp-route-id="@item.Id">
                                 Изтриване
                             </a>
 
@@ -98,5 +103,38 @@ else
         </table>
     </div>
 
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Навигация по страници">
+            <ul class="pagination">
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(Model.Page - 1)">
+                        Назад
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.Page >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(Model.Page + 1)">
+                        Напред
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
 }
 

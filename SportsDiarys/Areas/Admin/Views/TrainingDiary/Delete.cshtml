@@ -1,0 +1,36 @@
+﻿@model SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryFormVm
+
+<h1>Изтриване на дневник</h1>
+
+<div class="alert alert-warning">
+    Наистина ли искате да изтриете този дневник?
+</div>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Дата</th>
+        <td>@Model.Date.ToString("yyyy-MM-dd")</td>
+    </tr>
+    <tr>
+        <th>Продължителност (мин)</th>
+        <td>@Model.DurationMinutes</td>
+    </tr>
+    <tr>
+        <th>Място</th>
+        <td>@Model.Place</td>
+    </tr>
+    <tr>
+        <th>Вода (л)</th>
+        <td>@Model.WaterLiters</td>
+    </tr>
+    <tr>
+        <th>Бележки</th>
+        <td>@Model.Notes</td>
+    </tr>
+</table>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Изтрий</button>
+    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+</form>

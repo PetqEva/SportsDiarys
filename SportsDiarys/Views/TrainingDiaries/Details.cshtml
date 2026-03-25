@@ -110,7 +110,7 @@
                         <td><span class="badge bg-dark">@e.SportName</span></td>
                         <td class="text-end">@e.DurationMinutes</td>
                         <td class="text-end">@e.Calories</td>
-                        <td class="text-end text-nowrap">@(e.DistanceKm.HasValue ? $"{e.DistanceKm:0.##} km" : "-")</td>
+                        <td class="text-end text-nowrap">@(e.DistanceKm > 0 ? $"{e.DistanceKm:0.##} km" : "-")</td>
 
                         <td class="text-end text-nowrap">
                             <a class="btn btn-sm btn-outline-secondary"

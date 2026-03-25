@@ -6,7 +6,7 @@
 
 <div class="text-center mb-4">
     <h1 class="display-5 fw-bold">SportsDiarys</h1>
-    <p class="lead">Следи тренировките си, прогреса си и личните си цели.</p>
+    <p class="lead">Следи тренировките си, прогреса си и дневниците си.</p>
 </div>
 
 @if (!Model.IsAuthenticated)
@@ -15,7 +15,7 @@
         <div class="card-body text-center p-5">
             <h2 class="h4 mb-3">Добре дошъл</h2>
             <p class="text-muted mb-4">
-                Влез в профила си, за да видиш дневниците, тренировките и статистиката си.
+                Влез в профила си, за да видиш дневниците и тренировките си.
             </p>
 
             <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary me-2">Вход</a>
@@ -26,7 +26,7 @@
 else
 {
     <div class="row g-4 mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body text-center">
                     <h3 class="h6 text-muted">Дневници</h3>
@@ -35,11 +35,62 @@ else
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body text-center">
                     <h3 class="h6 text-muted">Тренировки</h3>
                     <div class="display-6 fw-bold">@Model.EntriesCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h3 class="h6 text-muted">Общо минути</h3>
+                    <div class="display-6 fw-bold">@Model.TotalDurationMinutes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h3 class="h6 text-muted">Изпита вода (л)</h3>
+                    <div class="display-6 fw-bold">@Model.TotalWaterLiters</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h3 class="h5 mb-3">Последни дневници</h3>
+
+                    @if (Model.RecentDiaries.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var diary in Model.RecentDiaries)
+                            {
+                                <li class="list-group-item">
+                                    <strong>@diary.Date.ToString("dd.MM.yyyy")</strong>
+                                    @if (!string.IsNullOrWhiteSpace(diary.Place))
+                                    {
+                                        <span>- @diary.Place</span>
+                                    }
+                                    <div class="small text-muted">
+                                        @diary.DurationMinutes мин. | @diary.WaterLiters л вода
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Все още няма добавени дневници.</p>
+                    }
                 </div>
             </div>
         </div>
@@ -48,12 +99,6 @@ else
     <div class="d-flex flex-wrap gap-2">
         <a asp-controller="TrainingDiaries" asp-action="Index" class="btn btn-primary">Моите дневници</a>
         <a asp-controller="TrainingEntries" asp-action="Index" class="btn btn-outline-primary">Моите тренировки</a>
-
-        @if (User.IsInRole("Administrator"))
-        {
-            <a asp-area="Admin" asp-controller="Exercises" asp-action="Index" class="btn btn-outline-secondary">Упражнения</a>
-        }
-
         <a asp-controller="Calculators" asp-action="Tdee" class="btn btn-outline-dark">TDEE калкулатор</a>
     </div>
 }

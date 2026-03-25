@@ -16,5 +16,7 @@
 
         public int UserProfileId { get; set; }
         public string UserName { get; set; } = null!;
+
+        public List<string> ExerciseNames { get; set; } = new();
     }
 }

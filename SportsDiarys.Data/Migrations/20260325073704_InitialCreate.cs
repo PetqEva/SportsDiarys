@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace SportsDiarys.Migrations
+namespace SportsDiarys.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -214,7 +214,9 @@ namespace SportsDiarys.Migrations
                     Place = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WaterLiters = table.Column<double>(type: "float", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    UserProfileId = table.Column<int>(type: "int", nullable: false)
+                    UserProfileId = table.Column<int>(type: "int", nullable: false),
+                    Calories = table.Column<int>(type: "int", nullable: false),
+                    DistanceKm = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -269,7 +271,7 @@ namespace SportsDiarys.Migrations
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TrainingEntryExercises_TrainingEntries_TrainingEntryId",
                         column: x => x.TrainingEntryId,
@@ -328,10 +330,9 @@ namespace SportsDiarys.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrainingDiaries_UserProfileId_Date",
+                name: "IX_TrainingDiaries_UserProfileId",
                 table: "TrainingDiaries",
-                columns: new[] { "UserProfileId", "Date" },
-                unique: true);
+                column: "UserProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrainingEntries_TrainingDiaryId",

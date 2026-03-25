@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using SportsDiarys.Services.Implementations;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Infrastructure;
+using SportsDiarys.Services.Implementations;
 using SportsDiarys.Services.Interfaces;
 using System.Globalization;
 
@@ -56,28 +56,30 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    dbContext.Database.Migrate();
+    await dbContext.Database.MigrateAsync();
 
     await IdentitySeeder.SeedRolesAndAdminAsync(services);
     await DbSeeder.SeedAsync(services);
 }
 
 // Error handling
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/StatusCodeError", "?code={0}");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 // Localization
-var supportedCultures = new[] { new CultureInfo("bg-BG"), new CultureInfo("en-US") };
+var supportedCultures = new[]
+{
+    new CultureInfo("bg-BG"),
+    new CultureInfo("en-US")
+};
 
 app.UseRequestLocalization(new RequestLocalizationOptions
 {

@@ -9,23 +9,25 @@ namespace SportsDiarys.Infrastructure
     {
         public static async Task SeedRolesAndAdminAsync(IServiceProvider services)
         {
-            using var scope = services.CreateScope();
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var dbContext = services.GetRequiredService<AppDbContext>();
 
-            // 1️⃣ Създаване на роли
             if (!await roleManager.RoleExistsAsync(Roles.User))
+            {
                 await roleManager.CreateAsync(new IdentityRole(Roles.User));
+            }
 
             if (!await roleManager.RoleExistsAsync(Roles.Administrator))
+            {
                 await roleManager.CreateAsync(new IdentityRole(Roles.Administrator));
+            }
 
-            // 2️⃣ Админ потребител
-            var adminEmail = "admin@sportdiary.bg";
-            var adminPassword = "Admin123!";
+            const string adminEmail = "admin@sportdiary.bg";
+            const string adminPassword = "Admin123!";
 
             var admin = await userManager.FindByEmailAsync(adminEmail);
+
             if (admin == null)
             {
                 admin = new ApplicationUser
@@ -35,34 +37,51 @@ namespace SportsDiarys.Infrastructure
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(admin, adminPassword);
-                if (!result.Succeeded)
-                    return; // спира ако има грешка
+                var createResult = await userManager.CreateAsync(admin, adminPassword);
+                if (!createResult.Succeeded)
+                {
+                    throw new InvalidOperationException(
+                        string.Join("; ", createResult.Errors.Select(e => e.Description)));
+                }
             }
 
-            // 3️⃣ Добавяне на админа в роля Administrator
             if (!await userManager.IsInRoleAsync(admin, Roles.Administrator))
-                await userManager.AddToRoleAsync(admin, Roles.Administrator);
-
-            // 4️⃣ Създаване на UserProfile за админа
-            var profileExists = await dbContext.UserProfiles
-                .AnyAsync(up => up.IdentityUserId == admin.Id);
-
-            if (!profileExists)
             {
-                var profile = new UserProfile
+                var addAdminRoleResult = await userManager.AddToRoleAsync(admin, Roles.Administrator);
+                if (!addAdminRoleResult.Succeeded)
                 {
-                    IdentityUserId = admin.Id, // винаги валиден
+                    throw new InvalidOperationException(
+                        string.Join("; ", addAdminRoleResult.Errors.Select(e => e.Description)));
+                }
+            }
+
+            if (!await userManager.IsInRoleAsync(admin, Roles.User))
+            {
+                var addUserRoleResult = await userManager.AddToRoleAsync(admin, Roles.User);
+                if (!addUserRoleResult.Succeeded)
+                {
+                    throw new InvalidOperationException(
+                        string.Join("; ", addUserRoleResult.Errors.Select(e => e.Description)));
+                }
+            }
+
+            var hasProfile = await dbContext.UserProfiles
+                .AnyAsync(x => x.IdentityUserId == admin.Id);
+
+            if (!hasProfile)
+            {
+                dbContext.UserProfiles.Add(new UserProfile
+                {
+                    IdentityUserId = admin.Id,
                     Name = "Administrator",
                     Age = 30,
                     Gender = "Male",
-                    StartWeightKg = 70,
-                    CurrentWeightKg = 70,
+                    StartWeightKg = 80,
+                    CurrentWeightKg = 78,
                     HeightCm = 180,
                     ActivityLevel = "Medium"
-                };
+                });
 
-                dbContext.UserProfiles.Add(profile);
                 await dbContext.SaveChangesAsync();
             }
         }

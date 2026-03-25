@@ -10,7 +10,7 @@ namespace SportsDiarys.Models
 
         [Required]
         [MaxLength(DiaryNameMaxLength)]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = null!;
 
         public DateTime Date { get; set; }
 
@@ -18,19 +18,22 @@ namespace SportsDiarys.Models
         public int DurationMinutes { get; set; }
 
         [Required]
-        public string Place { get; set; } = string.Empty; // Home/Gym/Outdoor/Other
+        public string? Place { get; set; } = null!;
 
         [Range(0, 20)]
         public double WaterLiters { get; set; }
 
         [MaxLength(500)]
-        public string? Notes { get; set; }
+        public string? Notes { get; set; } = null!;
 
         public int UserProfileId { get; set; }
 
         public UserProfile UserProfile { get; set; } = null!;
 
-        public ICollection<TrainingEntry> TrainingEntries { get; set; } = new List<TrainingEntry>();
+        public int Calories { get; set; }
+        public double DistanceKm { get; set; }
+
+        public ICollection<TrainingEntry> TrainingEntries { get; set; } = new HashSet<TrainingEntry>();
 
     }
 }

@@ -1,0 +1,42 @@
+﻿@model SportsDiarys.ViewModels.Admin.AdminDashboardVm
+
+@{
+    ViewData["Title"] = "Админ панел";
+}
+
+<h1 class="mb-4">Админ панел</h1>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5>Потребители</h5>
+                <div class="display-6">@Model.UsersCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5>Дневници</h5>
+                <div class="display-6">@Model.DiariesCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5>Записи</h5>
+                <div class="display-6">@Model.EntriesCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-area="Admin" asp-controller="Admin" asp-action="Users" class="btn btn-dark">
+        Управление на потребители
+    </a>
+</div>

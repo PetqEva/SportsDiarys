@@ -4,27 +4,41 @@ using Microsoft.AspNetCore.Mvc;
 using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
 
-namespace SportsDiarys.Controllers;
-
-[Authorize]
-public abstract class BaseController : Controller
+namespace SportsDiarys.Controllers
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IUserProfileService _profileService;
-
-    protected BaseController(
-        UserManager<ApplicationUser> userManager,
-        IUserProfileService profileService)
+    [Authorize]
+    public abstract class BaseController : Controller
     {
-        _userManager = userManager;
-        _profileService = profileService;
-    }
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserProfileService _profileService;
 
-    protected string GetUserId() => _userManager.GetUserId(User)!;
+        protected BaseController(
+            UserManager<ApplicationUser> userManager,
+            IUserProfileService profileService)
+        {
+            _userManager = userManager;
+            _profileService = profileService;
+        }
 
-    protected async Task<int?> GetMyProfileIdAsync()
-    {
-        var profile = await _profileService.GetMyProfileAsync(GetUserId());
-        return profile?.Id;
+        protected string GetUserId()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new InvalidOperationException("Потребителят не е удостоверен.");
+            }
+
+            return userId;
+        }
+
+        protected async Task<int?> GetMyProfileIdAsync()
+        {
+            var userId = GetUserId();
+
+            var profile = await _profileService.GetMyProfileAsync(userId);
+
+            return profile?.Id;
+        }
     }
 }

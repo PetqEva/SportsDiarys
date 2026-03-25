@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Exercises;
+using SportsDiarys.Infrastructure;
 
 namespace SportsDiarys.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = Roles.Administrator)]
     public class ExercisesController : Controller
     {
         private readonly IExerciseService _exerciseService;

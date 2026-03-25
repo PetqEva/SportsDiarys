@@ -10,7 +10,8 @@
         public double? DistanceKm { get; set; }
 
         public int TrainingDiaryId { get; set; }
-        public string DiaryLabel { get; set; } = string.Empty; // "Geri - 2026-02-02"
+        public string DiaryLabel { get; set; } = string.Empty;
+
+        public List<string> ExerciseNames { get; set; } = new();
     }
 }
-

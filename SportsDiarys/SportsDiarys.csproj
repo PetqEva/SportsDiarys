@@ -24,7 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Identity\Pages\Account\" />
+    <Folder Include="Areas\Admin\Account\" />
+    <Folder Include="Areas\Identity\" />
   </ItemGroup>
 
 </Project>

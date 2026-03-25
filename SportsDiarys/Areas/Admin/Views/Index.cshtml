@@ -1,0 +1,34 @@
+﻿@model SportsDiarys.ViewModels.Admin.AdminDashboardVm
+
+<h1 class="mb-4">Админ панел</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6>Потребители</h6>
+                <h2>@Model.UsersCount</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6>Дневници</h6>
+                <h2>@Model.DiariesCount</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6>Тренировки</h6>
+                <h2>@Model.EntriesCount</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a asp-action="Users" class="btn btn-primary">Управление на потребители</a>
