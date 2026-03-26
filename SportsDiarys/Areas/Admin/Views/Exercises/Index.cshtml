@@ -4,16 +4,33 @@
     ViewData["Title"] = "Упражнения";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="mb-3">@ViewData["Title"]</h1>
 
-<form method="get" class="mb-3">
+@if (TempData["AdminSuccess"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["AdminSuccess"]
+    </div>
+}
+
+@if (TempData["AdminError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["AdminError"]
+    </div>
+}
+
+<form method="get" class="mb-3 d-flex gap-2">
     <input type="text"
            name="Search"
            value="@Model.Query.Search"
            placeholder="Търсене..."
-           class="form-control w-25 d-inline" />
+           class="form-control"
+           style="max-width: 300px;" />
 
-    <button type="submit" class="btn btn-primary ms-2">Търси</button>
+    <button type="submit" class="btn btn-primary">Търси</button>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">Изчисти</a>
 </form>
 
 <p>
@@ -28,14 +45,14 @@
 }
 else
 {
-    <table class="table table-striped">
+    <table class="table table-striped align-middle">
         <thead>
             <tr>
                 <th>Име</th>
                 <th>Мускулна група</th>
                 <th>Трудност</th>
                 <th>Активно</th>
-                <th></th>
+                <th class="text-end">Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -46,11 +63,17 @@ else
                     <td>@item.MuscleGroup</td>
                     <td>@item.Difficulty</td>
                     <td>@(item.IsActive ? "Да" : "Не")</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id"
-                           class="btn btn-sm btn-outline-primary">Редакция</a>
+                    <td class="text-end">
+                        <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary">
+                            Редакция
+                        </a>
 
-                        <form asp-action="SetActive" method="post" style="display:inline">
+                        <form asp-action="ToggleActive"
+                              method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@item.Id" />
                             <input type="hidden" name="isActive" value="@(!item.IsActive)" />
 
@@ -64,12 +87,13 @@ else
         </tbody>
     </table>
 
-    <nav>
+    <nav aria-label="Навигация по страници">
         <ul class="pagination">
             <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                 <a class="page-link"
                        asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage - 1)">
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-search="@Model.Query.Search">
                     Назад
                 </a>
             </li>
@@ -79,7 +103,8 @@ else
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                     <a class="page-link"
                            asp-action="Index"
-                           asp-route-page="@i">
+                           asp-route-page="@i"
+                           asp-route-search="@Model.Query.Search">
                         @i
                     </a>
                 </li>
@@ -88,7 +113,8 @@ else
             <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
                 <a class="page-link"
                        asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage + 1)">
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-search="@Model.Query.Search">
                     Напред
                 </a>
             </li>

@@ -48,12 +48,14 @@ namespace SportsDiarys.Areas.Admin.Controllers
 
             foreach (var user in users)
             {
+                bool isAdministrator = await _userManager.IsInRoleAsync(user, Roles.Administrator);
+
                 model.Add(new UserAdminVm
                 {
                     Id = user.Id,
                     Email = user.Email ?? string.Empty,
                     UserName = user.UserName ?? string.Empty,
-                    IsAdministrator = await _userManager.IsInRoleAsync(user, Roles.Administrator)
+                    IsAdministrator = isAdministrator
                 });
             }
 
@@ -64,18 +66,31 @@ namespace SportsDiarys.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Promote(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                TempData["AdminError"] = "Невалиден потребител.";
+                return RedirectToAction(nameof(Users));
+            }
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return NotFound();
+                TempData["AdminError"] = "Потребителят не е намерен.";
+                return RedirectToAction(nameof(Users));
             }
 
-            if (!await _userManager.IsInRoleAsync(user, Roles.Administrator))
+            bool isAdministrator = await _userManager.IsInRoleAsync(user, Roles.Administrator);
+            if (!isAdministrator)
             {
                 var result = await _userManager.AddToRoleAsync(user, Roles.Administrator);
+
                 if (!result.Succeeded)
                 {
                     TempData["AdminError"] = string.Join("; ", result.Errors.Select(e => e.Description));
+                }
+                else
+                {
+                    TempData["AdminSuccess"] = "Потребителят беше направен администратор.";
                 }
             }
 
@@ -86,18 +101,38 @@ namespace SportsDiarys.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Demote(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                TempData["AdminError"] = "Невалиден потребител.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser != null && currentUser.Id == id)
+            {
+                TempData["AdminError"] = "Не можеш да премахнеш собствената си администраторска роля.";
+                return RedirectToAction(nameof(Users));
+            }
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return NotFound();
+                TempData["AdminError"] = "Потребителят не е намерен.";
+                return RedirectToAction(nameof(Users));
             }
 
-            if (await _userManager.IsInRoleAsync(user, Roles.Administrator))
+            bool isAdministrator = await _userManager.IsInRoleAsync(user, Roles.Administrator);
+            if (isAdministrator)
             {
                 var result = await _userManager.RemoveFromRoleAsync(user, Roles.Administrator);
+
                 if (!result.Succeeded)
                 {
                     TempData["AdminError"] = string.Join("; ", result.Errors.Select(e => e.Description));
+                }
+                else
+                {
+                    TempData["AdminSuccess"] = "Администраторските права бяха премахнати.";
                 }
             }
 

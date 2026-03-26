@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SportsDiarys.Infrastructure;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Exercises;
-using SportsDiarys.Infrastructure;
 
 namespace SportsDiarys.Areas.Admin.Controllers
 {
@@ -20,16 +20,20 @@ namespace SportsDiarys.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] ExerciseQueryVm query)
         {
-            var vm = await _exerciseService.GetPagedAsync(query);
+            query.Page = query.Page < 1 ? 1 : query.Page;
+            query.PageSize = query.PageSize < 1 ? 10 : query.PageSize;
 
-            ViewBag.Query = query; // за да си запазим филтрите във view-то
-            return View(vm);
+            var model = await _exerciseService.GetPagedAsync(query);
+            ViewBag.Query = query;
+
+            return View(model);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new ExerciseFormVm());
+            var model = new ExerciseFormVm();
+            return View(model);
         }
 
         [HttpPost]
@@ -37,17 +41,29 @@ namespace SportsDiarys.Areas.Admin.Controllers
         public async Task<IActionResult> Create(ExerciseFormVm model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
             var id = await _exerciseService.CreateAsync(model);
+
+            TempData["AdminSuccess"] = "Упражнението беше създадено успешно.";
             return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            if (id <= 0)
+            {
+                return NotFound();
+            }
+
             var model = await _exerciseService.GetForEditAsync(id);
-            if (model == null) return NotFound();
+            if (model == null)
+            {
+                return NotFound();
+            }
 
             return View(model);
         }
@@ -57,11 +73,17 @@ namespace SportsDiarys.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(ExerciseFormVm model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
-            var ok = await _exerciseService.UpdateAsync(model);
-            if (!ok) return NotFound();
+            var success = await _exerciseService.UpdateAsync(model);
+            if (!success)
+            {
+                return NotFound();
+            }
 
+            TempData["AdminSuccess"] = "Упражнението беше редактирано успешно.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -69,12 +91,22 @@ namespace SportsDiarys.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleActive(int id, bool isActive)
         {
-            var ok = await _exerciseService.SetActiveAsync(id, isActive);
-            if (!ok) return NotFound();
+            if (id <= 0)
+            {
+                return NotFound();
+            }
+
+            var success = await _exerciseService.SetActiveAsync(id, isActive);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            TempData["AdminSuccess"] = isActive
+                ? "Упражнението беше активирано."
+                : "Упражнението беше деактивирано.";
 
             return RedirectToAction(nameof(Index));
         }
     }
 }
-
-
