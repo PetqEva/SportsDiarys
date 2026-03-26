@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SportsDiarys.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Home;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace SportsDiarys.Controllers
 {
- 	[AllowAnonymous]
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly IHomeDashboardService _dashboardService;
@@ -16,15 +18,19 @@ namespace SportsDiarys.Controllers
             _dashboardService = dashboardService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             HomeDashboardVm vm;
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                vm = new HomeDashboardVm { IsAuthenticated = false };
+                vm = new HomeDashboardVm
+                {
+                    IsAuthenticated = false
+                };
             }
             else
             {
@@ -34,12 +40,28 @@ namespace SportsDiarys.Controllers
             return View(vm);
         }
 
+        [HttpGet]
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public IActionResult StatusCodeError(int code)
         {
             ViewData["ErrorCode"] = code;
             return View();
         }
 
-        public IActionResult Privacy() => View();
+        [HttpGet]
+        public IActionResult Error()
+        {
+            var model = new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(model);
+        }
     }
 }

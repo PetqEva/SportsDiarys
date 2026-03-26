@@ -47,6 +47,7 @@ builder.Services.AddScoped<ITrainingDiaryService, TrainingDiaryService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IHomeDashboardService, HomeDashboardService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
+// builder.Services.AddScoped<IAdminService, AdminService>(); // добави това, ако направиш AdminService
 
 var app = builder.Build();
 
@@ -54,12 +55,20 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<AppDbContext>();
 
-    await dbContext.Database.MigrateAsync();
+    try
+    {
+        var dbContext = services.GetRequiredService<AppDbContext>();
 
-    await IdentitySeeder.SeedRolesAndAdminAsync(services);
-    await DbSeeder.SeedAsync(services);
+        await dbContext.Database.MigrateAsync();
+        await IdentitySeeder.SeedRolesAndAdminAsync(services);
+        await DbSeeder.SeedAsync(services);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database migration / seeding error:");
+        Console.WriteLine(ex.Message);
+    }
 }
 
 // Error handling
@@ -67,6 +76,10 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseStatusCodePagesWithReExecute("/Home/StatusCodeError", "?code={0}");

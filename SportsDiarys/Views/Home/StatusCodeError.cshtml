@@ -1,5 +1,25 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Грешка";
+    var code = ViewData["ErrorCode"] as int? ?? 0;
 }
+
+<div class="container py-5">
+    <h1 class="mb-3">Грешка @code</h1>
+
+    @if (code == 404)
+    {
+        <p class="text-muted">Страницата не съществува.</p>
+    }
+    else if (code == 403)
+    {
+        <p class="text-muted">Нямаш достъп.</p>
+    }
+    else
+    {
+        <p class="text-muted">Възникна грешка.</p>
+    }
+
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+        Начало
+    </a>
+</div>
