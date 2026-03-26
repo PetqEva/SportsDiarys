@@ -12,7 +12,6 @@ namespace SportsDiarys.Tests.Services
         [Fact]
         public async Task CreateAsync_ShouldCreateDiary_WhenDataIsValid()
         {
-            // Arrange
             using var context = TestDbHelper.CreateInMemoryDbContext();
             var service = new TrainingDiaryService(context);
 
@@ -29,10 +28,8 @@ namespace SportsDiarys.Tests.Services
 
             int userProfileId = 1;
 
-            // Act
             var id = await service.CreateAsync(model, userProfileId);
 
-            // Assert
             var diary = await context.TrainingDiaries.FindAsync(id);
 
             diary.Should().NotBeNull();
@@ -111,8 +108,11 @@ namespace SportsDiarys.Tests.Services
             result.Should().BeTrue();
 
             var diary = await context.TrainingDiaries.FindAsync(1);
+            diary.Should().NotBeNull();
             diary!.Place.Should().Be("Gym");
             diary.Notes.Should().Be("Updated");
+            diary.DurationMinutes.Should().Be(60);
+            diary.Calories.Should().Be(200);
         }
 
         [Fact]
@@ -177,9 +177,32 @@ namespace SportsDiarys.Tests.Services
             var service = new TrainingDiaryService(context);
 
             context.TrainingDiaries.AddRange(
-                new TrainingDiary { Id = 1, UserProfileId = 1, Date = DateTime.Now, Name = "A" },
-                new TrainingDiary { Id = 2, UserProfileId = 2, Date = DateTime.Now, Name = "B" }
-            );
+                new TrainingDiary
+                {
+                    Id = 1,
+                    UserProfileId = 1,
+                    Name = "Diary A",
+                    Date = new DateTime(2026, 3, 25),
+                    Notes = "Test A",
+                    Place = "Gym",
+                    DurationMinutes = 45,
+                    Calories = 300,
+                    DistanceKm = 2.5,
+                    WaterLiters = 1.5
+                },
+                new TrainingDiary
+                {
+                    Id = 2,
+                    UserProfileId = 2,
+                    Name = "Diary B",
+                    Date = new DateTime(2026, 3, 25),
+                    Notes = "Test B",
+                    Place = "Park",
+                    DurationMinutes = 30,
+                    Calories = 200,
+                    DistanceKm = 4,
+                    WaterLiters = 1
+                });
 
             await context.SaveChangesAsync();
 
@@ -187,6 +210,48 @@ namespace SportsDiarys.Tests.Services
 
             result.Items.Should().HaveCount(1);
             result.Items.First().Id.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task GetMyDiariesAsync_ShouldFilterBySearch()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingDiaryService(context);
+
+            context.TrainingDiaries.AddRange(
+                new TrainingDiary
+                {
+                    Id = 1,
+                    UserProfileId = 1,
+                    Name = "Gym Day",
+                    Date = DateTime.Today,
+                    Notes = "Strength training",
+                    Place = "Fitness",
+                    DurationMinutes = 60,
+                    Calories = 350,
+                    DistanceKm = 2,
+                    WaterLiters = 2
+                },
+                new TrainingDiary
+                {
+                    Id = 2,
+                    UserProfileId = 1,
+                    Name = "Running Day",
+                    Date = DateTime.Today,
+                    Notes = "Cardio session",
+                    Place = "Park",
+                    DurationMinutes = 30,
+                    Calories = 250,
+                    DistanceKm = 5,
+                    WaterLiters = 1
+                });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetMyDiariesAsync(1, "Gym", 1, 10);
+
+            result.Items.Should().HaveCount(1);
+            result.Items.First().Place.Should().Be("Fitness");
         }
     }
 }

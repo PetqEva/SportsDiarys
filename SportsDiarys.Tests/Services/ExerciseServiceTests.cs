@@ -34,6 +34,8 @@ namespace SportsDiarys.Tests.Services
             entity!.Name.Should().Be("Push-Up");
             entity.MuscleGroup.Should().Be("Chest");
             entity.Description.Should().Be("Bodyweight exercise");
+            entity.Difficulty.Should().Be(DifficultyLevel.Easy);
+            entity.Type.Should().Be(ExerciseType.Strength);
             entity.IsActive.Should().BeTrue();
         }
 
@@ -72,10 +74,13 @@ namespace SportsDiarys.Tests.Services
             result.Should().BeTrue();
 
             var entity = await context.Exercises.FindAsync(1);
+
             entity.Should().NotBeNull();
             entity!.Name.Should().Be("Updated Exercise");
             entity.MuscleGroup.Should().Be("Back");
             entity.Description.Should().Be("Updated description");
+            entity.Difficulty.Should().Be(DifficultyLevel.Hard);
+            entity.Type.Should().Be(ExerciseType.Cardio);
         }
 
         [Fact]
@@ -89,8 +94,10 @@ namespace SportsDiarys.Tests.Services
                 Id = 999,
                 Name = "Missing",
                 MuscleGroup = "Chest",
+                Description = "Missing exercise",
                 Difficulty = 1,
-                Type = 0
+                Type = 0,
+                IsActive = true
             };
 
             var result = await service.UpdateAsync(model);
@@ -123,6 +130,33 @@ namespace SportsDiarys.Tests.Services
             var entity = await context.Exercises.FindAsync(1);
             entity.Should().NotBeNull();
             entity!.IsActive.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task SetActiveAsync_ShouldActivateExercise_WhenExerciseExists()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new ExerciseService(context);
+
+            context.Exercises.Add(new Exercise
+            {
+                Id = 1,
+                Name = "Old Exercise",
+                MuscleGroup = "Back",
+                Difficulty = DifficultyLevel.Medium,
+                Type = ExerciseType.Strength,
+                IsActive = false
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.SetActiveAsync(1, true);
+
+            result.Should().BeTrue();
+
+            var entity = await context.Exercises.FindAsync(1);
+            entity.Should().NotBeNull();
+            entity!.IsActive.Should().BeTrue();
         }
 
         [Fact]
@@ -171,6 +205,47 @@ namespace SportsDiarys.Tests.Services
         }
 
         [Fact]
+        public async Task GetForEditAsync_ShouldReturnModel_WhenExerciseExists()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new ExerciseService(context);
+
+            context.Exercises.Add(new Exercise
+            {
+                Id = 1,
+                Name = "Push-Up",
+                MuscleGroup = "Chest",
+                Description = "Bodyweight exercise",
+                Difficulty = DifficultyLevel.Easy,
+                Type = ExerciseType.Strength,
+                IsActive = true
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetForEditAsync(1);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be(1);
+            result.Name.Should().Be("Push-Up");
+            result.MuscleGroup.Should().Be("Chest");
+            result.Description.Should().Be("Bodyweight exercise");
+            result.Difficulty.Should().Be(0);
+            result.Type.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task GetForEditAsync_ShouldReturnNull_WhenExerciseDoesNotExist()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new ExerciseService(context);
+
+            var result = await service.GetForEditAsync(999);
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
         public async Task GetPagedAsync_ShouldReturnOnlyMatchingExercises_WhenSearchIsApplied()
         {
             using var context = TestDbHelper.CreateInMemoryDbContext();
@@ -194,8 +269,7 @@ namespace SportsDiarys.Tests.Services
                     Difficulty = DifficultyLevel.Medium,
                     Type = ExerciseType.Strength,
                     IsActive = true
-                }
-            );
+                });
 
             await context.SaveChangesAsync();
 
@@ -219,7 +293,7 @@ namespace SportsDiarys.Tests.Services
             using var context = TestDbHelper.CreateInMemoryDbContext();
             var service = new ExerciseService(context);
 
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 12; i++)
             {
                 context.Exercises.Add(new Exercise
                 {
@@ -237,14 +311,46 @@ namespace SportsDiarys.Tests.Services
             var query = new ExerciseQueryVm
             {
                 Page = 2,
-                PageSize = 2
+                PageSize = 5
             };
 
             var result = await service.GetPagedAsync(query);
 
             result.Should().NotBeNull();
             result.CurrentPage.Should().Be(2);
-            result.Items.Should().HaveCount(2);
+            result.PageSize.Should().Be(5);
+            result.Items.Should().HaveCount(5);
+        }
+
+        [Fact]
+        public async Task GetPagedAsync_ShouldReturnEmptyCollection_WhenNoExercisesMatchSearch()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new ExerciseService(context);
+
+            context.Exercises.Add(new Exercise
+            {
+                Id = 1,
+                Name = "Push-Up",
+                MuscleGroup = "Chest",
+                Difficulty = DifficultyLevel.Easy,
+                Type = ExerciseType.Strength,
+                IsActive = true
+            });
+
+            await context.SaveChangesAsync();
+
+            var query = new ExerciseQueryVm
+            {
+                Search = "Swimming",
+                Page = 1,
+                PageSize = 10
+            };
+
+            var result = await service.GetPagedAsync(query);
+
+            result.Should().NotBeNull();
+            result.Items.Should().BeEmpty();
         }
     }
 }
