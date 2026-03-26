@@ -22,6 +22,8 @@ namespace SportsDiarys.Data
         public DbSet<Exercise> Exercises { get; set; } = null!;
         public DbSet<TrainingEntryExercise> TrainingEntryExercises { get; set; } = null!;
 
+        public DbSet<NutritionTarget> NutritionTargets { get; set; } = null!;
+
         // ========================
         // Model Configuration
         // ========================

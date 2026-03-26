@@ -18,6 +18,22 @@
 
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
+
+    @* ✔ Success / Error messages *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <hr />
 
     <div class="row g-4">
@@ -37,44 +53,46 @@
 
                     <div class="mb-3">
                         <label asp-for="Age" class="form-label">Възраст (години)</label>
-                        <input asp-for="Age" class="form-control" placeholder="пример: 30" />
+                        <input asp-for="Age" class="form-control" />
                         <span asp-validation-for="Age" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="WeightKg" class="form-label">Тегло (кг)</label>
-                        <input asp-for="WeightKg" class="form-control" placeholder="пример: 80" />
+                        <input asp-for="WeightKg" class="form-control" />
                         <span asp-validation-for="WeightKg" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="HeightCm" class="form-label">Ръст (см)</label>
-                        <input asp-for="HeightCm" class="form-control" placeholder="пример: 180" />
+                        <input asp-for="HeightCm" class="form-control" />
                         <span asp-validation-for="HeightCm" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="ActivityMultiplier" class="form-label">Ниво на активност</label>
                         <select asp-for="ActivityMultiplier" class="form-select">
-                            <option value="1.2">Заседнал (офис) — 1.2</option>
-                            <option value="1.375">Лека (1–3 трен./седм.) — 1.375</option>
-                            <option value="1.55">Умерена (3–5 трен./седм.) — 1.55</option>
-                            <option value="1.725">Висока (6–7 трен./седм.) — 1.725</option>
-                            <option value="1.9">Много висока (физ. труд/2 трен.) — 1.9</option>
+                            <option value="1.2">Заседнал — 1.2</option>
+                            <option value="1.375">Лека — 1.375</option>
+                            <option value="1.55">Умерена — 1.55</option>
+                            <option value="1.725">Висока — 1.725</option>
+                            <option value="1.9">Много висока — 1.9</option>
                         </select>
                         <span asp-validation-for="ActivityMultiplier" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="BodyFatPercent" class="form-label">Процент мазнини (по желание)</label>
-                        <input asp-for="BodyFatPercent" class="form-control" placeholder="пример: 15" />
+                        <input asp-for="BodyFatPercent" class="form-control" />
                         <span asp-validation-for="BodyFatPercent" class="text-danger"></span>
                         <div class="form-text">
-                            Ако го попълниш, използваме Katch–McArdle (по-точно).
+                            Ако го попълниш, използваме Katch–McArdle.
                         </div>
                     </div>
 
-                    <button class="btn btn-primary w-100" type="submit">Изчисли</button>
+                    <button class="btn btn-primary w-100" type="submit">
+                        Изчисли
+                    </button>
                 </div>
             </form>
         </div>
@@ -84,72 +102,65 @@
             {
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h4 class="mb-1">Резултат</h4>
-                                <div class="text-muted">
-                                    Метод: <strong>@result.Method</strong>
-                                </div>
-                            </div>
-                        </div>
+                        <h4>Резултат</h4>
+                        <p class="text-muted">Метод: <strong>@result.Method</strong></p>
 
                         <ul class="list-group mt-3">
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>BMR (базов разход)</span>
+                                <span>BMR</span>
                                 <strong>@result.Bmr kcal</strong>
                             </li>
 
-                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
-                                <span class="fw-semibold">Дневен калориен разход (TDEE)</span>
-                                <strong class="fs-5 text-primary">@result.Tdee kcal</strong>
+                            <li class="list-group-item d-flex justify-content-between bg-light">
+                                <span class="fw-semibold">TDEE</span>
+                                <strong class="text-primary">@result.Tdee kcal</strong>
                             </li>
 
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Дефицит -15%</span>
+                                <span>Cut -15%</span>
                                 <strong class="text-danger">@result.Cut15 kcal</strong>
                             </li>
 
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Дефицит -20%</span>
+                                <span>Cut -20%</span>
                                 <strong class="text-danger">@result.Cut20 kcal</strong>
                             </li>
 
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Покачване +10%</span>
+                                <span>Bulk +10%</span>
                                 <strong class="text-success">@result.Bulk10 kcal</strong>
                             </li>
 
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span>BMI</span>
-                                <span class="d-flex gap-2 align-items-center">
+                                <span>
                                     <strong>@result.Bmi</strong>
-                                    <span class="badge @bmiBadge(result.Bmi)">@bmiLabel(result.Bmi)</span>
+                                    <span class="badge @bmiBadge(result.Bmi)">
+                                        @bmiLabel(result.Bmi)
+                                    </span>
                                 </span>
                             </li>
 
                             @if (result.LeanBodyMassKg.HasValue)
                             {
                                 <li class="list-group-item d-flex justify-content-between">
-                                    <span>Чиста маса (LBM)</span>
+                                    <span>LBM</span>
                                     <strong>@result.LeanBodyMassKg.Value кг</strong>
                                 </li>
                             }
 
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Протеин (2 g/kg)</span>
+                                <span>Protein</span>
                                 <strong>@result.ProteinTargetG г</strong>
                             </li>
                         </ul>
 
-                        <div class="mt-3 small text-muted">
-                            Ориентир. Настройва се по тегло/мерки за 2–3 седмици.
-                        </div>
-
                         <form asp-controller="NutritionTargets" asp-action="Save" method="post" class="mt-3">
                             @Html.AntiForgeryToken()
 
-                            <input type="hidden" name="Calories" value="@result.Tdee" />
-                            <input type="hidden" name="ProteinGrams" value="@result.ProteinTargetG" />
+                            @* ✔ ВАЖНО: имената трябва да съвпадат *@
+                            <input type="hidden" name="calories" value="@result.Tdee" />
+                            <input type="hidden" name="proteinGrams" value="@result.ProteinTargetG" />
 
                             <button type="submit" class="btn btn-outline-primary w-100">
                                 Запази като дневна цел
@@ -161,7 +172,7 @@
             else
             {
                 <div class="alert alert-secondary">
-                    Попълни данните и натисни <strong>Изчисли</strong>.
+                    Попълни данните и натисни „Изчисли“.
                 </div>
             }
         </div>
