@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Home;
 using System.Diagnostics;
 using System.Security.Claims;
+using SportsDiarys.Infrastructure; 
 
 namespace SportsDiarys.Controllers
 {
@@ -12,10 +15,14 @@ namespace SportsDiarys.Controllers
     public class HomeController : Controller
     {
         private readonly IHomeDashboardService _dashboardService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(IHomeDashboardService dashboardService)
+        public HomeController(
+            IHomeDashboardService dashboardService,
+            UserManager<ApplicationUser> userManager)
         {
             _dashboardService = dashboardService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -34,6 +41,13 @@ namespace SportsDiarys.Controllers
             }
             else
             {
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user != null && !await _userManager.IsInRoleAsync(user, Roles.User))
+                {
+                    await _userManager.AddToRoleAsync(user, Roles.User);
+                }
+
                 vm = await _dashboardService.GetDashboardAsync(userId);
             }
 
