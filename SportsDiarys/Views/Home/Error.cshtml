@@ -1,16 +1,44 @@
 ﻿@model SportsDiarys.Models.ErrorViewModel
 @{
     ViewData["Title"] = "Грешка (500)";
+    var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 }
 
-<div class="container py-5">
-    <h1 class="mb-3">Вътрешна грешка.</h1>
-    <p class="text-muted">Възникна проблем при обработката на заявката (500).</p>
+<div class="container py-5 text-center">
+    <h1 class="display-4 text-danger">500</h1>
+    <h2 class="mb-3">Вътрешна грешка</h2>
+
+    <p class="text-muted">
+        Възникна неочакван проблем при обработката на заявката.
+        Моля, опитайте отново по-късно.
+    </p>
 
     @if (Model?.ShowRequestId == true)
     {
-        <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
+        <p class="mt-3">
+            <strong>Request ID:</strong>
+            <code>@Model.RequestId</code>
+        </p>
     }
 
-    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Начало</a>
+    @if (isDevelopment)
+    {
+        <div class="alert alert-warning mt-4 text-start">
+            <strong>Debug информация (само за Development):</strong>
+            <ul>
+                <li>Environment: @Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</li>
+                <li>Request ID: @Model?.RequestId</li>
+            </ul>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a class="btn btn-primary me-2" asp-controller="Home" asp-action="Index">
+            Начало
+        </a>
+
+        <a class="btn btn-outline-secondary" href="javascript:history.back()">
+            Назад
+        </a>
+    </div>
 </div>

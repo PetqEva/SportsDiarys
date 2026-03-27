@@ -21,7 +21,7 @@ namespace SportsDiarys.ViewModels.TrainingEntries
         [Range(0, 50)]
         public double? DistanceKm { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Избери дневник.")]
         public int TrainingDiaryId { get; set; }
 
         // dropdown за Create/Edit

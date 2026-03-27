@@ -1,49 +1,61 @@
-﻿@using SportsDiarys.ViewModels.TrainingDiaries
-@model TrainingDiaryFormVm
+﻿@model SportsDiarys.ViewModels.TrainingDiaries.UpdateTrainingDiaryViewModel
+
 @{
     ViewData["Title"] = "Редакция на дневник";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
 <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-    <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
         <label asp-for="Date" class="form-label">Дата</label>
-        <input asp-for="Date" class="form-control" type="date" />
+        <input asp-for="Date" type="date" class="form-control" />
         <span asp-validation-for="Date" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="DurationMinutes" class="form-label">Времетраене (минути)</label>
-        <input asp-for="DurationMinutes" class="form-control" type="number" min="0" max="600" />
-        <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
         <label asp-for="Place" class="form-label">Място</label>
-        <select asp-for="Place" asp-items="Model.PlaceOptions" class="form-select">
-            <option value="">-- избери --</option>
-        </select>
+        <select asp-for="Place" asp-items="Model.PlaceOptions" class="form-select"></select>
         <span asp-validation-for="Place" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
+        <label asp-for="DurationMinutes" class="form-label">Продължителност (минути)</label>
+        <input asp-for="DurationMinutes" class="form-control" />
+        <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Calories" class="form-label">Калории</label>
+        <input asp-for="Calories" class="form-control" />
+        <span asp-validation-for="Calories" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DistanceKm" class="form-label">Разстояние (км)</label>
+        <input asp-for="DistanceKm" class="form-control" />
+        <span asp-validation-for="DistanceKm" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
         <label asp-for="WaterLiters" class="form-label">Вода (литри)</label>
-        <input asp-for="WaterLiters" class="form-control" type="number" step="0.1" min="0" max="20" />
+        <input asp-for="WaterLiters" class="form-control" />
         <span asp-validation-for="WaterLiters" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Notes" class="form-label">Бележки</label>
-        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+        <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
         <span asp-validation-for="Notes" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Запази</button>
-    <a class="btn btn-secondary" asp-action="Index">Назад</a>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Отказ</a>
 </form>
 
 @section Scripts {

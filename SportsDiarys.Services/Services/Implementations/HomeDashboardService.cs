@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Home;
 

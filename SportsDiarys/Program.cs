@@ -17,7 +17,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -38,6 +37,13 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+// Cookie configuration (IMPORTANT)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Home/StatusCodeError?code=403";
+});
+
 // Authorization
 builder.Services.AddAuthorization();
 
@@ -47,7 +53,6 @@ builder.Services.AddScoped<ITrainingDiaryService, TrainingDiaryService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IHomeDashboardService, HomeDashboardService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
-// builder.Services.AddScoped<IAdminService, AdminService>(); // добави това, ако направиш AdminService
 
 var app = builder.Build();
 
@@ -67,19 +72,15 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Console.WriteLine("Database migration / seeding error:");
-        Console.WriteLine(ex.Message);
+        Console.WriteLine(ex.ToString());
     }
 }
 
-// Error handling
+// Error handling (clean version)
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
-}
-else
-{
-    app.UseDeveloperExceptionPage();
 }
 
 app.UseStatusCodePagesWithReExecute("/Home/StatusCodeError", "?code={0}");

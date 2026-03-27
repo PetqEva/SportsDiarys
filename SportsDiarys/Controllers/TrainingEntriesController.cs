@@ -121,6 +121,10 @@ namespace SportsDiarys.Controllers
             foreach (var error in _entryService.ValidateBusinessRules(vm))
                 ModelState.AddModelError(error.Field, error.Message);
 
+            var diaryIsMine = await _entryService.DiaryBelongsToMeAsync(vm.TrainingDiaryId, pid);
+            if (!diaryIsMine)
+                ModelState.AddModelError(nameof(vm.TrainingDiaryId), "Невалиден дневник.");
+
             if (!ModelState.IsValid)
             {
                 vm.Diaries = await BuildMyDiariesSelectAsync(pid, vm.TrainingDiaryId);
@@ -185,6 +189,10 @@ namespace SportsDiarys.Controllers
 
             foreach (var error in _entryService.ValidateBusinessRules(vm))
                 ModelState.AddModelError(error.Field, error.Message);
+
+            var diaryIsMine = await _entryService.DiaryBelongsToMeAsync(vm.TrainingDiaryId, pid);
+            if (!diaryIsMine)
+                ModelState.AddModelError(nameof(vm.TrainingDiaryId), "Невалиден дневник.");
 
             if (!ModelState.IsValid)
             {
@@ -283,7 +291,33 @@ namespace SportsDiarys.Controllers
                 return View("Details", pageVm);
             }
 
-            await _entryService.AddExerciseAsync(model, pid);
+            var added = await _entryService.AddExerciseAsync(model, pid);
+            if (!added)
+            {
+                ModelState.AddModelError("AddExercise.ExerciseId", "Упражнението не можа да бъде добавено. Вече е добавено, не съществува или записът не е твой.");
+
+                var entry = await _entryService.GetMyEntryDetailsAsync(model.TrainingEntryId, pid);
+                if (entry == null) return NotFound();
+
+                var exercises = await _entryService.GetEntryExercisesAsync(model.TrainingEntryId, pid);
+                var available = await _entryService.GetActiveExercisesAsync();
+
+                model.AvailableExercises = available.Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Name
+                }).ToList();
+
+                var pageVm = new TrainingEntryDetailsPageVm
+                {
+                    Entry = entry,
+                    Exercises = exercises,
+                    AddExercise = model,
+                    ReturnUrl = returnUrl
+                };
+
+                return View("Details", pageVm);
+            }
 
             return RedirectToAction(nameof(Details), new { id = model.TrainingEntryId, returnUrl });
         }
@@ -296,7 +330,10 @@ namespace SportsDiarys.Controllers
             if (userProfileId == null) return RedirectToAction("Create", "UserProfiles");
 
             var pid = userProfileId.Value;
-            await _entryService.RemoveExerciseAsync(trainingEntryId, exerciseId, pid);
+            var removed = await _entryService.RemoveExerciseAsync(trainingEntryId, exerciseId, pid);
+
+            if (!removed)
+                return NotFound();
 
             return RedirectToAction(nameof(Details), new { id = trainingEntryId, returnUrl });
         }

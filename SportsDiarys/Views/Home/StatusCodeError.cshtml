@@ -1,25 +1,35 @@
 ﻿@{
-    ViewData["Title"] = "Грешка";
     var code = ViewData["ErrorCode"] as int? ?? 0;
+
+    ViewData["Title"] = code switch
+    {
+        404 => "Грешка 404",
+        403 => "Грешка 403",
+        500 => "Грешка 500",
+        _ => "Грешка"
+    };
+
+    var message = code switch
+    {
+        404 => "Страницата, която търсиш, не беше намерена.",
+        403 => "Нямаш права за достъп до този ресурс.",
+        500 => "Възникна вътрешна грешка в сървъра.",
+        _ => "Възникна неочаквана грешка."
+    };
 }
 
-<div class="container py-5">
-    <h1 class="mb-3">Грешка @code</h1>
+<div class="container py-5 text-center">
+    <h1 class="display-4 text-danger">@code</h1>
+    <h2 class="mb-3">@ViewData["Title"]</h2>
+    <p class="text-muted">@message</p>
 
-    @if (code == 404)
-    {
-        <p class="text-muted">Страницата не съществува.</p>
-    }
-    else if (code == 403)
-    {
-        <p class="text-muted">Нямаш достъп.</p>
-    }
-    else
-    {
-        <p class="text-muted">Възникна грешка.</p>
-    }
+    <div class="mt-4">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary me-2">
+            Начало
+        </a>
 
-    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
-        Начало
-    </a>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+            Назад
+        </a>
+    </div>
 </div>

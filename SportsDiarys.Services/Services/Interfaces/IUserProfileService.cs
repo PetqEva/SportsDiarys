@@ -1,4 +1,6 @@
-﻿namespace SportsDiarys.Services.Interfaces
+﻿using SportsDiarys.Data.Models;
+
+namespace SportsDiarys.Services.Interfaces
 {
     public interface IUserProfileService
     {

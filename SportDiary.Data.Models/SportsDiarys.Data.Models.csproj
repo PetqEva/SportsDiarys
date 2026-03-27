@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SportsDiarys.GCommon\SportsDiarys.GCommon.csproj" />
+    <ProjectReference Include="..\SportsDiarys.GCommon\SportsDiarys.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

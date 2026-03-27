@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using SportsDiarys.Data.Models;
 using SportsDiarys.Models;
 using SportsDiarys.Services.Implementations;
 using SportsDiarys.Tests.Helpers;

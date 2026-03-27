@@ -59,10 +59,18 @@ namespace SportsDiarys.Services.Implementations
             if (existing == null)
                 return false;
 
+            bool targetDiaryIsMine = await _context.TrainingDiaries
+                .AnyAsync(d => d.Id == entry.TrainingDiaryId &&
+                               d.UserProfileId == userProfileId);
+
+            if (!targetDiaryIsMine)
+                return false;
+
             existing.SportName = entry.SportName.Trim();
             existing.DurationMinutes = entry.DurationMinutes;
             existing.Calories = entry.Calories;
             existing.DistanceKm = entry.DistanceKm;
+            existing.TrainingDiaryId = entry.TrainingDiaryId;
 
             await _context.SaveChangesAsync();
             return true;
@@ -266,14 +274,20 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<bool> AddExerciseAsync(AddExerciseToEntryVm model, int userProfileId)
         {
-            var exists = await _context.TrainingEntries
+            var entryExists = await _context.TrainingEntries
                 .AnyAsync(e => e.Id == model.TrainingEntryId &&
                                e.TrainingDiary.UserProfileId == userProfileId);
 
-            if (!exists)
+            if (!entryExists)
                 return false;
 
             if (!model.ExerciseId.HasValue)
+                return false;
+
+            var exerciseExists = await _context.Exercises
+                .AnyAsync(e => e.Id == model.ExerciseId.Value && e.IsActive);
+
+            if (!exerciseExists)
                 return false;
 
             var already = await _context.TrainingEntryExercises
@@ -300,8 +314,12 @@ namespace SportsDiarys.Services.Implementations
         public async Task<bool> RemoveExerciseAsync(int entryId, int exerciseId, int userProfileId)
         {
             var entity = await _context.TrainingEntryExercises
-                .FirstOrDefaultAsync(x => x.TrainingEntryId == entryId &&
-                                         x.ExerciseId == exerciseId);
+                .Include(x => x.TrainingEntry)
+                    .ThenInclude(e => e.TrainingDiary)
+                .FirstOrDefaultAsync(x =>
+                    x.TrainingEntryId == entryId &&
+                    x.ExerciseId == exerciseId &&
+                    x.TrainingEntry.TrainingDiary.UserProfileId == userProfileId);
 
             if (entity == null)
                 return false;

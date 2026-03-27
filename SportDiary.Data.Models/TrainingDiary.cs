@@ -1,8 +1,7 @@
-﻿using SportsDiarys.Data.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using static SportsDiarys.Common.ValidationConstants;
 
-namespace SportsDiarys.Models
+namespace SportsDiarys.Data.Models
 {
     public class TrainingDiary
     {
@@ -18,22 +17,22 @@ namespace SportsDiarys.Models
         public int DurationMinutes { get; set; }
 
         [Required]
-        public string? Place { get; set; } = null!;
+        public string Place { get; set; } = null!;
 
         [Range(0, 20)]
         public double WaterLiters { get; set; }
 
         [MaxLength(500)]
-        public string? Notes { get; set; } = null!;
+        public string? Notes { get; set; }
 
         public int UserProfileId { get; set; }
 
         public UserProfile UserProfile { get; set; } = null!;
 
         public int Calories { get; set; }
+
         public double DistanceKm { get; set; }
 
         public ICollection<TrainingEntry> TrainingEntries { get; set; } = new HashSet<TrainingEntry>();
-
     }
 }
