@@ -257,3 +257,70 @@ SportsDiarys/
 ├── SportsDiarys.GCommon/              -> Constants, roles, validation rules
 ├── SportsDiarys.Tests/                -> Unit tests
 └── README.md
+
+---
+
+## 15. How to Run the Project Locally
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/PetqEva/SportsDiarys
+cd SportsDiarys
+
+"ConnectionStrings": {
+  "DefaultConnection": "Server=.;Database=SportsDiarysDb;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+
+dotnet ef database update
+
+
+## 16. Unit Tests
+
+The project includes unit tests located in the **SportsDiarys.Tests** project.
+
+### Tested Services
+- TrainingDiaryService
+- TrainingEntryService
+- ExerciseService
+- UserProfileService
+- HomeDashboardService
+
+### Tools Used
+- xUnit
+- FluentAssertions
+- EF Core InMemory Database
+
+### Run tests
+```bash
+dotnet test**
+
+## 17. Test Coverage
+
+The business logic in the service layer is covered with unit tests.
+
+### Coverage Target
+Minimum required: **65% service layer coverage**
+
+### Generate coverage
+```bash
+dotnet test --collect:"XPlat Code Coverage"
+
+
+## 18. Deployment
+
+### Live Application
+Live Demo: <PUT YOUR AZURE LINK HERE>
+
+### GitHub Repository
+https://github.com/PetqEva/SportsDiarys
+
+### Notes
+The application is deployed using Azure App Service with SQL Server database.
+
+---
+
+## 19. Screenshots
+
+![Home](docs/screenshots/home.png)
+![Dashboard](docs/screenshots/dashboard.png)
+![Admin](docs/screenshots/admin.png)
