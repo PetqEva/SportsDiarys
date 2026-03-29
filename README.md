@@ -258,69 +258,80 @@ SportsDiarys/
 ├── SportsDiarys.Tests/                -> Unit tests
 └── README.md
 
----
-
 ## 15. How to Run the Project Locally
 
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/PetqEva/SportsDiarys
 cd SportsDiarys
+2. Open the solution
 
+Open SportsDiarys.sln with Visual Studio 2022 or JetBrains Rider.
+
+3. Configure the database
+
+Edit appsettings.json:
 "ConnectionStrings": {
   "DefaultConnection": "Server=.;Database=SportsDiarysDb;Trusted_Connection=True;TrustServerCertificate=True;"
 }
-
+4. Apply migrations
 dotnet ef database update
+5. Run the project
+dotnet run
+6. Unit Tests
 
+The project includes unit tests located in the SportsDiarys.Tests project.
 
-## 16. Unit Tests
-
-The project includes unit tests located in the **SportsDiarys.Tests** project.
-
-### Tested Services
-- TrainingDiaryService
-- TrainingEntryService
-- ExerciseService
-- UserProfileService
-- HomeDashboardService
-
-### Tools Used
-- xUnit
-- FluentAssertions
-- EF Core InMemory Database
-
-### Run tests
-```bash
-dotnet test**
-
-## 17. Test Coverage
+Tested Services
+TrainingDiaryService
+TrainingEntryService
+ExerciseService
+UserProfileService
+HomeDashboardService
+Tools Used
+xUnit
+FluentAssertions
+EF Core InMemory Database
+Run tests
+dotnet test
+17. Test Coverage
 
 The business logic in the service layer is covered with unit tests.
 
-### Coverage Target
-Minimum required: **65% service layer coverage**
+Coverage Target
 
-### Generate coverage
-```bash
+Minimum required: 65% service layer coverage
+
+Generate coverage
 dotnet test --collect:"XPlat Code Coverage"
+Current coverage
 
+Service layer coverage: <PUT YOUR REAL % HERE>
 
-## 18. Deployment
+18. Deployment
+Live Application
 
-### Live Application
 Live Demo: <PUT YOUR AZURE LINK HERE>
 
-### GitHub Repository
+GitHub Repository
+
 https://github.com/PetqEva/SportsDiarys
 
-### Notes
+Notes
+
 The application is deployed using Azure App Service with SQL Server database.
 
----
+19. Screenshots
+/docs/screenshots/
 
-## 19. Screenshots
+- home.png
+- dashboard.png
+- admin.png
 
-![Home](docs/screenshots/home.png)
-![Dashboard](docs/screenshots/dashboard.png)
-![Admin](docs/screenshots/admin.png)
+
+
+
+
+
+
+
