@@ -246,14 +246,7 @@ Seeding helps the project start with usable initial data and demonstrates practi
 
 ## 14. Project Structure
 
-```text
-SportsDiarys/
-│
-├── SportsDiarys/                      -> ASP.NET Core MVC application
-├── SportsDiarys.Data/                 -> DbContext, EF Core configuration, migrations
-├── SportDiary.Data.Models/            -> Entity models
-├── SportsDiarys.Services/             -> Interfaces and implementations of services
-├── SportsDiarys.ViewModels/           -> View models used by the UI
-├── SportsDiarys.GCommon/              -> Constants, roles, validation rules
-├── SportsDiarys.Tests/                -> Unit tests
-└── README.md
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=SportsDiarysDb;Trusted_Connection=True;"
+}
