@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+	<DataCollectionRunSettings>
+		<DataCollectors>
+			<DataCollector friendlyName="XPlat Code Coverage">
+				<Configuration>
+
+					<Format>cobertura</Format>
+
+					<Include>
+						[SportsDiarys.Services]*
+					</Include>
+
+					<Exclude>
+						[SportsDiarys]*.Controllers.*
+						[SportsDiarys]*.Areas.*
+						[SportsDiarys]*.Views.*
+						[SportsDiarys]*.ViewModels.*
+						[SportsDiarys]*.Program
+						[SportsDiarys]*.Startup
+						[SportsDiarys.Tests]*
+						[Microsoft.*]*
+						[System.*]*
+					</Exclude>
+
+					<ExcludeByFile>
+						**/Migrations/*.cs
+						**/wwwroot/**
+						**/Views/**
+						**/Areas/**
+						**/Program.cs
+						**/Startup.cs
+					</ExcludeByFile>
+
+					<ExcludeByAttribute>
+						Obsolete
+						GeneratedCodeAttribute
+						CompilerGeneratedAttribute
+						ExcludeFromCodeCoverageAttribute
+					</ExcludeByAttribute>
+
+					<SkipAutoProps>true</SkipAutoProps>
+					<SingleHit>false</SingleHit>
+
+				</Configuration>
+			</DataCollector>
+		</DataCollectors>
+	</DataCollectionRunSettings>
+</RunSettings>
