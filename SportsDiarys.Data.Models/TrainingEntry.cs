@@ -1,6 +1,6 @@
-﻿using SportsDiarys.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using static SportsDiarys.Common.ValidationConstants;
+
 
 namespace SportsDiarys.Data.Models
 {

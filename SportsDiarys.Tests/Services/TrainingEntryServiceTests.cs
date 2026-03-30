@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Models;
 using SportsDiarys.Services.Implementations;
 using SportsDiarys.Tests.Helpers;
 using SportsDiarys.ViewModels.TrainingEntries;
@@ -64,8 +63,12 @@ namespace SportsDiarys.Tests.Services
             var id = await service.CreateAsync(entry, 1);
 
             var created = await context.TrainingEntries.FindAsync(id);
+
             created.Should().NotBeNull();
             created!.SportName.Should().Be("Running");
+            created.DurationMinutes.Should().Be(30);
+            created.Calories.Should().Be(250);
+            created.DistanceKm.Should().Be(5);
             created.TrainingDiaryId.Should().Be(1);
         }
 
@@ -157,6 +160,7 @@ namespace SportsDiarys.Tests.Services
             dbEntry.DurationMinutes.Should().Be(50);
             dbEntry.Calories.Should().Be(350);
             dbEntry.DistanceKm.Should().Be(7);
+            dbEntry.TrainingDiaryId.Should().Be(1);
         }
 
         [Fact]
@@ -242,6 +246,43 @@ namespace SportsDiarys.Tests.Services
         }
 
         [Fact]
+        public async Task DeleteAsync_ShouldReturnFalse_WhenEntryDoesNotBelongToUser()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            var diary = new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 2,
+                Name = "Diary",
+                Date = DateTime.Today,
+                Place = "Gym",
+                DurationMinutes = 60,
+                WaterLiters = 2,
+                Calories = 300,
+                DistanceKm = 2
+            };
+
+            context.TrainingDiaries.Add(diary);
+            context.TrainingEntries.Add(new TrainingEntry
+            {
+                Id = 1,
+                SportName = "Run",
+                DurationMinutes = 20,
+                Calories = 100,
+                TrainingDiaryId = 1,
+                TrainingDiary = diary
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.DeleteAsync(1, 1);
+
+            result.Should().BeFalse();
+        }
+
+        [Fact]
         public async Task GetMyEntriesPagedAsync_ShouldFilterBySport_AndReturnPagedItems()
         {
             using var context = TestDbHelper.CreateInMemoryDbContext();
@@ -298,6 +339,60 @@ namespace SportsDiarys.Tests.Services
         }
 
         [Fact]
+        public async Task GetMyEntriesAsync_ShouldReturnOnlyEntriesForCurrentUser()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            var myDiary = new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 1,
+                Name = "My Diary",
+                Date = new DateTime(2026, 3, 20),
+                Place = "Gym"
+            };
+
+            var otherDiary = new TrainingDiary
+            {
+                Id = 2,
+                UserProfileId = 2,
+                Name = "Other Diary",
+                Date = new DateTime(2026, 3, 21),
+                Place = "Park"
+            };
+
+            context.TrainingDiaries.AddRange(myDiary, otherDiary);
+
+            context.TrainingEntries.AddRange(
+                new TrainingEntry
+                {
+                    Id = 1,
+                    SportName = "Running",
+                    DurationMinutes = 30,
+                    Calories = 200,
+                    TrainingDiaryId = 1,
+                    TrainingDiary = myDiary
+                },
+                new TrainingEntry
+                {
+                    Id = 2,
+                    SportName = "Cycling",
+                    DurationMinutes = 40,
+                    Calories = 300,
+                    TrainingDiaryId = 2,
+                    TrainingDiary = otherDiary
+                });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetMyEntriesAsync(1);
+
+            result.Should().HaveCount(1);
+            result.First().Id.Should().Be(1);
+        }
+
+        [Fact]
         public async Task DiaryBelongsToMeAsync_ShouldReturnTrue_WhenDiaryIsOwnedByUser()
         {
             using var context = TestDbHelper.CreateInMemoryDbContext();
@@ -321,6 +416,28 @@ namespace SportsDiarys.Tests.Services
             var result = await service.DiaryBelongsToMeAsync(1, 1);
 
             result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task DiaryBelongsToMeAsync_ShouldReturnFalse_WhenDiaryIsNotOwnedByUser()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            context.TrainingDiaries.Add(new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 2,
+                Name = "Diary",
+                Date = DateTime.Today,
+                Place = "Gym"
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.DiaryBelongsToMeAsync(1, 1);
+
+            result.Should().BeFalse();
         }
 
         [Fact]
@@ -438,15 +555,17 @@ namespace SportsDiarys.Tests.Services
                 TrainingDiary = diary
             };
 
-            context.TrainingDiaries.Add(diary);
-            context.TrainingEntries.Add(entry);
-            context.Exercises.Add(new Exercise
+            var exercise = new Exercise
             {
                 Id = 1,
                 Name = "Bench Press",
                 MuscleGroup = "Chest",
                 IsActive = true
-            });
+            };
+
+            context.TrainingDiaries.Add(diary);
+            context.TrainingEntries.Add(entry);
+            context.Exercises.Add(exercise);
             context.TrainingEntryExercises.Add(new TrainingEntryExercise
             {
                 TrainingEntryId = 1,
@@ -469,11 +588,32 @@ namespace SportsDiarys.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveExerciseAsync_ShouldReturnTrue_WhenExerciseExistsInEntry()
+        public async Task RemoveExerciseAsync_ShouldReturnTrue_WhenExerciseExistsInEntry_AndEntryBelongsToUser()
         {
             using var context = TestDbHelper.CreateInMemoryDbContext();
             var service = new TrainingEntryService(context);
 
+            var diary = new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 1,
+                Name = "Diary",
+                Date = DateTime.Today,
+                Place = "Gym"
+            };
+
+            var entry = new TrainingEntry
+            {
+                Id = 1,
+                SportName = "Workout",
+                DurationMinutes = 45,
+                Calories = 350,
+                TrainingDiaryId = 1,
+                TrainingDiary = diary
+            };
+
+            context.TrainingDiaries.Add(diary);
+            context.TrainingEntries.Add(entry);
             context.TrainingEntryExercises.Add(new TrainingEntryExercise
             {
                 TrainingEntryId = 1,
@@ -484,7 +624,7 @@ namespace SportsDiarys.Tests.Services
 
             await context.SaveChangesAsync();
 
-            var result = await service.RemoveExerciseAsync(1, 1, 999);
+            var result = await service.RemoveExerciseAsync(1, 1, 1);
 
             result.Should().BeTrue();
             context.TrainingEntryExercises.Should().BeEmpty();

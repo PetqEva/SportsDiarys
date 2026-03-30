@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.23" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.23" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.23" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.23">
       <PrivateAssets>all</PrivateAssets>
@@ -20,12 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SportsDiarys.Common\SportsDiarys.Common.csproj" />
+    <ProjectReference Include="..\SportsDiarys.Data\SportsDiarys.Data.csproj" />
     <ProjectReference Include="..\SportsDiarys.Services\SportsDiarys.Services.csproj" />
     <ProjectReference Include="..\SportsDiarys.ViewModels\SportsDiarys.ViewModels.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Areas\Identity\" />
   </ItemGroup>
 
 </Project>

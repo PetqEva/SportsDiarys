@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SportDiary.Data.Models\SportsDiarys.Data.Models.csproj" />
-    <ProjectReference Include="..\SportsDiarys.GCommon\SportsDiarys.Common.csproj" />
+    <ProjectReference Include="..\SportsDiarys.Data.Models\SportsDiarys.Data.Models.csproj" />
+	  <ProjectReference Include="..\SportsDiarys.Common\SportsDiarys.Common.csproj" />
   </ItemGroup>
 
 </Project>

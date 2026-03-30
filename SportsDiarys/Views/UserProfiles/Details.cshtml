@@ -2,19 +2,19 @@
 @model UserProfile
 
 @{
-    ViewData["Title"] = "Детайли";
+    ViewData["Title"] = "Моят профил";
+
     string dash(string? s) => string.IsNullOrWhiteSpace(s) ? "-" : s;
 
-    // BMI
     double? heightM = Model.HeightCm > 0 ? Model.HeightCm / 100.0 : null;
     double? bmi = null;
+
     if (heightM.HasValue && Model.CurrentWeightKg > 0)
     {
         var raw = Model.CurrentWeightKg / (heightM.Value * heightM.Value);
         bmi = Math.Round(raw, 1);
     }
 
-    // BMR (Mifflin–St Jeor) on current weight
     int? bmr = null;
     if (Model.CurrentWeightKg > 0 && Model.HeightCm > 0 && Model.Age > 0)
     {
@@ -34,7 +34,6 @@
 
     int? tdee = bmr.HasValue ? (int)Math.Round(bmr.Value * activityFactor) : null;
 
-    // Activity badge
     string activityText = Model.ActivityLevel switch
     {
         "Low" => "Ниска активност",
@@ -51,7 +50,6 @@
         _ => "bg-secondary"
     };
 
-    // Progress
     double? diff = null;
     double? diffPct = null;
 
@@ -68,67 +66,134 @@
     string progressBadge = diff.HasValue
         ? (diff.Value < 0 ? "bg-success" : diff.Value > 0 ? "bg-danger" : "bg-secondary")
         : "bg-secondary";
+
+    string genderText = Model.Gender == "Male"
+        ? "Мъж"
+        : Model.Gender == "Female"
+            ? "Жена"
+            : dash(Model.Gender);
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Моят профил</h1>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3">Име</dt>
-            <dd class="col-sm-9">@dash(Model.Name)</dd>
-
-            <dt class="col-sm-3">Години</dt>
-            <dd class="col-sm-9">@Model.Age</dd>
-
-            <dt class="col-sm-3">Пол</dt>
-            <dd class="col-sm-9">
-                @(Model.Gender == "Male" ? "Мъж" :
-                                Model.Gender == "Female" ? "Жена" :
-                                dash(Model.Gender))
-            </dd>
-
-            <dt class="col-sm-3">Стартови килограми</dt>
-            <dd class="col-sm-9">@($"{Model.StartWeightKg:0.##} кг")</dd>
-
-            <dt class="col-sm-3">Текущи килограми</dt>
-            <dd class="col-sm-9">@($"{Model.CurrentWeightKg:0.##} кг")</dd>
-
-            <dt class="col-sm-3">Височина</dt>
-            <dd class="col-sm-9">@($"{Model.HeightCm} см")</dd>
-
-            <dt class="col-sm-3">Активност</dt>
-            <dd class="col-sm-9"><span class="badge @activityBadge">@activityText</span></dd>
-        </dl>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" asp-controller="TrainingDiaries" asp-action="Index">Дневници</a>
+        <a class="btn btn-outline-secondary" asp-controller="TrainingEntries" asp-action="Index">Записи</a>
+        <a class="btn btn-primary" asp-action="Edit">Редакция</a>
+        <a class="btn btn-outline-danger" asp-action="Delete">Изтриване</a>
     </div>
 </div>
 
-<div class="card mb-3">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
-        <h5 class="card-title mb-3">Метрики</h5>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">Име</div>
+                    <div class="fw-semibold fs-5">@dash(Model.Name)</div>
+                </div>
+            </div>
 
-        <dl class="row mb-0">
-            <dt class="col-sm-4">Прогрес спрямо старт</dt>
-            <dd class="col-sm-8"><span class="badge @progressBadge">@progressText</span></dd>
+            <div class="col-md-6 col-lg-3">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">Години</div>
+                    <div class="fw-semibold fs-5">@Model.Age</div>
+                </div>
+            </div>
 
-            <dt class="col-sm-4">BMI</dt>
-            <dd class="col-sm-8">@(bmi?.ToString("0.0") ?? "-")</dd>
+            <div class="col-md-6 col-lg-3">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">Пол</div>
+                    <div class="fw-semibold fs-5">@genderText</div>
+                </div>
+            </div>
 
-            <dt class="col-sm-4">BMR (ккал/ден)</dt>
-            <dd class="col-sm-8">@(bmr?.ToString() ?? "-")</dd>
-
-            <dt class="col-sm-4">Дневни калории (TDEE)</dt>
-            <dd class="col-sm-8">@(tdee?.ToString() ?? "-")</dd>
-        </dl>
-
-        <small class="text-muted">
-            TDEE = BMR × фактор на активност (@activityFactor).
-        </small>
+            <div class="col-md-6 col-lg-3">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">Активност</div>
+                    <div><span class="badge @activityBadge fs-6">@activityText</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<p class="mt-3">
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Стартово тегло</div>
+                <div class="fw-bold fs-4">@($"{Model.StartWeightKg:0.##} кг")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Текущо тегло</div>
+                <div class="fw-bold fs-4">@($"{Model.CurrentWeightKg:0.##} кг")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Височина</div>
+                <div class="fw-bold fs-4">@($"{Model.HeightCm} см")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Промяна</div>
+                <div><span class="badge @progressBadge fs-6">@progressText</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h4 class="mb-3">Метрики</h4>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">BMI</div>
+                    <div class="fw-bold fs-5">@(bmi?.ToString("0.0") ?? "-")</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">BMR</div>
+                    <div class="fw-bold fs-5">@(bmr?.ToString() ?? "-")</div>
+                    <div class="small text-muted">ккал / ден</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="border rounded-3 p-3 h-100">
+                    <div class="text-muted small">TDEE</div>
+                    <div class="fw-bold fs-5">@(tdee?.ToString() ?? "-")</div>
+                    <div class="small text-muted">ккал / ден</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 text-muted small">
+            TDEE = BMR × фактор на активност (@activityFactor)
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2">
     <a class="btn btn-primary" asp-action="Edit">Редакция</a>
-    <a class="btn btn-danger" asp-action="Delete">Изтриване</a>
+    <a class="btn btn-outline-danger" asp-action="Delete">Изтриване</a>
     <a class="btn btn-secondary" asp-action="Index">Назад</a>
-</p>
+</div>

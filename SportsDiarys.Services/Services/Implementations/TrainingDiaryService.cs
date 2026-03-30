@@ -199,14 +199,15 @@ namespace SportsDiarys.Services.Implementations
             {
                 Id = diary.Id,
                 Date = diary.Date,
-                Notes = diary.Notes ?? string.Empty,
+                Notes = diary.Notes,
+                Place = diary.Place,
                 UserProfileId = diary.UserProfileId,
                 UserName = diary.UserProfile?.Name ?? string.Empty,
-                Entries = entries,
                 TotalEntries = entries.Count,
-                TotalCalories = entries.Sum(x => x.Calories),
                 TotalDurationMinutes = entries.Sum(x => x.DurationMinutes),
-                TotalDistanceKm = entries.Sum(x => x.DistanceKm)
+                TotalCalories = entries.Sum(x => x.Calories),
+                TotalDistanceKm = entries.Sum(x => x.DistanceKm),
+                Entries = entries
             };
         }
     }

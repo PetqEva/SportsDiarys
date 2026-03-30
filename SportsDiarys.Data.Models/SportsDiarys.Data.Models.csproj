@@ -11,8 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SportsDiarys.GCommon\SportsDiarys.Common.csproj" />
+    <ProjectReference Include="..\SportsDiarys.Common\SportsDiarys.Common.csproj" />
   </ItemGroup>
+
 
   <ItemGroup>
     <None Update="Properties\launchSettings.json">

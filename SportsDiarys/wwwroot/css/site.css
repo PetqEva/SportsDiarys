@@ -1,5 +1,7 @@
 html {
     font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,17 +10,17 @@ html {
     }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-    position: relative;
-    min-height: 100%;
-}
-
 body {
     margin-bottom: 60px;
+    background-color: #f5f7fb;
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .navbar-nav {
@@ -27,7 +29,7 @@ body {
     margin-bottom: 0;
 }
 
-/* HERO STYLE */
+/* HERO */
 .hero-gradient {
     background: linear-gradient(135deg, #0f172a, #1e3a8a);
     border-radius: 16px;
@@ -37,11 +39,34 @@ body {
         border-radius: 12px;
     }
 
+/* CARDS */
 .kpi-card,
 .card {
+    background: #ffffff;
+    border: none;
     border-radius: 16px;
 }
 
+.card-body {
+    padding: 1.25rem;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+/* BUTTONS */
 .btn {
-    border-radius: 12px;
+    border-radius: 10px;
+}
+
+/* BADGES */
+.badge {
+    font-size: 0.75rem;
 }

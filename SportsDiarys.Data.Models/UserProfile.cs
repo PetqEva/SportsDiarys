@@ -1,5 +1,4 @@
-﻿using SportsDiarys.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SportsDiarys.Data.Models

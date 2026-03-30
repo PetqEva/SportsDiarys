@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Models;
 using SportsDiarys.Models.Enums;
 
 namespace SportsDiarys.Infrastructure

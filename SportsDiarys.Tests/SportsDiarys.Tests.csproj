@@ -24,10 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SportDiary.Data.Models\SportsDiarys.Data.Models.csproj" />
+    <ProjectReference Include="..\SportsDiarys.Data.Models\SportsDiarys.Data.Models.csproj" />
     <ProjectReference Include="..\SportsDiarys.Data\SportsDiarys.Data.csproj" />
     <ProjectReference Include="..\SportsDiarys.Services\SportsDiarys.Services.csproj" />
     <ProjectReference Include="..\SportsDiarys.ViewModels\SportsDiarys.ViewModels.csproj" />
+	<ProjectReference Include="..\SportsDiarys.Common\SportsDiarys.Common.csproj" />
   </ItemGroup>
 
 </Project>

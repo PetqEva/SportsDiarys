@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using SportsDiarys.Data.Models
+@using SportsDiarys.Common
+@using SportsDiarys.Infrastructure
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
@@ -23,10 +25,11 @@
                 </a>
             </li>
 
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole(Roles.Administrator))
             {
                 <li>
                     <a class="dropdown-item"
+                           asp-area="Admin"
                            asp-controller="Admin"
                            asp-action="Index">
                         Админ панел
@@ -41,6 +44,7 @@
                       asp-page="/Account/Logout"
                       method="post"
                       class="px-3">
+                    @Html.AntiForgeryToken()
                     <button type="submit" class="btn btn-outline-danger btn-sm w-100">
                         Изход
                     </button>
@@ -67,4 +71,3 @@ else
         </a>
     </li>
 }
-

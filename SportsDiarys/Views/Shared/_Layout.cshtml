@@ -7,45 +7,93 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+            body {
+                background: #f5f7fb;
+            }
+
+            .navbar {
+                backdrop-filter: blur(10px);
+            }
+
+            .card {
+                border-radius: 16px;
+            }
+    </style>
 </head>
 <body>
+
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">
-                    SportsDiarys
+
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    🏋️ SportsDiarys
                 </a>
 
                 <button class="navbar-toggler" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                        data-bs-toggle="collapse" data-bs-target="#mainNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav me-auto gap-lg-2">
+
+                    <ul class="navbar-nav me-auto">
+
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="UserProfiles" asp-action="Index">Профил</a>
+                                <a class="nav-link" asp-controller="UserProfiles" asp-action="Index">
+                                    👤 Профил
+                                </a>
                             </li>
+
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="TrainingDiaries" asp-action="Index">Дневници</a>
+                                <a class="nav-link" asp-controller="TrainingDiaries" asp-action="Index">
+                                    📓 Дневници
+                                </a>
                             </li>
+
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="TrainingEntries" asp-action="Index">Записи</a>
+                                <a class="nav-link" asp-controller="TrainingEntries" asp-action="Index">
+                                    📊 Записи
+                                </a>
                             </li>
+
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Calculators" asp-action="Tdee">Калкулатор</a>
+                                <a class="nav-link" asp-controller="Calculators" asp-action="Tdee">
+                                    🔥 Калкулатор
+                                </a>
                             </li>
 
                             @if (User.IsInRole("Administrator"))
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="Index">Админ панел</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="Admin" asp-controller="Exercises" asp-action="Index">Упражнения</a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-warning fw-semibold"
+                                           data-bs-toggle="dropdown">
+                                        ⚙️ Админ
+                                    </a>
+
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                                   asp-area="Admin"
+                                                   asp-controller="Admin"
+                                                   asp-action="Index">
+                                                Dashboard
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item"
+                                                   asp-area="Admin"
+                                                   asp-controller="Exercises"
+                                                   asp-action="Index">
+                                                Упражнения
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
                             }
                         }
@@ -54,25 +102,28 @@
                     <ul class="navbar-nav ms-auto">
                         <partial name="_LoginPartial" />
                     </ul>
+
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container mt-4">
+
         @if (TempData["Success"] is string msg)
         {
-            <div class="alert alert-success mt-3 mb-3">@msg</div>
+            <div class="alert alert-success shadow-sm">@msg</div>
         }
 
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
+
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="text-center text-muted py-3 mt-5">
         <div class="container">
-            &copy; 2026 - SportsDiarys
+            © 2026 SportsDiarys
         </div>
     </footer>
 
@@ -81,5 +132,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
