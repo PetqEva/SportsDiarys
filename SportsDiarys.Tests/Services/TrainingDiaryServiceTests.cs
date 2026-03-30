@@ -404,10 +404,24 @@ namespace SportsDiarys.Tests.Services
             using var context = TestDbHelper.CreateInMemoryDbContext();
             var service = new TrainingDiaryService(context);
 
+            var user = new ApplicationUser
+            {
+                Id = "user-1",
+                UserName = "petq@abv.bg",
+                Email = "petq@abv.bg"
+            };
+
             var profile = new UserProfile
             {
                 Id = 1,
-                Name = "Petq"
+                IdentityUserId = "user-1",
+                Name = "Petq",
+                Age = 30,
+                Gender = "Male",
+                StartWeightKg = 80,
+                CurrentWeightKg = 78,
+                HeightCm = 180,
+                ActivityLevel = "Medium"
             };
 
             var diary = new TrainingDiary
@@ -420,26 +434,29 @@ namespace SportsDiarys.Tests.Services
                 Notes = "My notes",
                 Place = "Gym",
                 TrainingEntries = new List<TrainingEntry>
-                {
-                    new TrainingEntry
-                    {
-                        Id = 11,
-                        SportName = "Running",
-                        DurationMinutes = 30,
-                        Calories = 200,
-                        DistanceKm = 4
-                    },
-                    new TrainingEntry
-                    {
-                        Id = 12,
-                        SportName = "Cycling",
-                        DurationMinutes = 45,
-                        Calories = 300,
-                        DistanceKm = 8
-                    }
-                }
+        {
+            new TrainingEntry
+            {
+                Id = 11,
+                SportName = "Running",
+                DurationMinutes = 30,
+                Calories = 200,
+                DistanceKm = 4,
+                TrainingDiaryId = 1
+            },
+            new TrainingEntry
+            {
+                Id = 12,
+                SportName = "Cycling",
+                DurationMinutes = 45,
+                Calories = 300,
+                DistanceKm = 8,
+                TrainingDiaryId = 1
+            }
+        }
             };
 
+            context.Users.Add(user);
             context.UserProfiles.Add(profile);
             context.TrainingDiaries.Add(diary);
             await context.SaveChangesAsync();
@@ -449,6 +466,7 @@ namespace SportsDiarys.Tests.Services
             result.Should().NotBeNull();
             result!.Id.Should().Be(1);
             result.UserName.Should().Be("Petq");
+            result.Place.Should().Be("Gym");
             result.TotalEntries.Should().Be(2);
             result.TotalDurationMinutes.Should().Be(75);
             result.TotalCalories.Should().Be(500);
