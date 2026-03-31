@@ -352,5 +352,44 @@ namespace SportsDiarys.Tests.Services
             result.Should().NotBeNull();
             result.Items.Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task GetPagedAsync_ShouldReturnEmpty_WhenPageIsOutOfRange()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new ExerciseService(context);
+
+            var result = await service.GetPagedAsync(new ExerciseQueryVm
+            {
+                Page = 999,
+                PageSize = 10
+            });
+
+            result.Items.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetPagedAsync_ShouldBeCaseInsensitive()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new ExerciseService(context);
+
+            context.Exercises.Add(new Exercise
+            {
+                Id = 1,
+                Name = "Push-Up",
+                MuscleGroup = "Chest",
+                IsActive = true
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetPagedAsync(new ExerciseQueryVm
+            {
+                Search = "push"
+            });
+
+            result.Items.Should().ContainSingle();
+        }
     }
 }

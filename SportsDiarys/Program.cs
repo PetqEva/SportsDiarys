@@ -53,6 +53,7 @@ builder.Services.AddScoped<ITrainingDiaryService, TrainingDiaryService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IHomeDashboardService, HomeDashboardService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
 
 var app = builder.Build();
 

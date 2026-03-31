@@ -990,5 +990,35 @@ namespace SportsDiarys.Tests.Services
             result.Items.Should().HaveCount(1);
             result.Page.Should().Be(1);
         }
+
+        [Fact]
+        public async Task CreateAsync_ShouldThrow_WhenDiaryDoesNotExist()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            var entry = new TrainingEntry
+            {
+                SportName = "Run",
+                DurationMinutes = 10,
+                Calories = 50,
+                TrainingDiaryId = 999
+            };
+
+            var act = async () => await service.CreateAsync(entry, 1);
+
+            await act.Should().ThrowAsync<Exception>();
+        }
+
+        [Fact]
+        public async Task RemoveExerciseAsync_ShouldReturnFalse_WhenRelationDoesNotExist()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            var result = await service.RemoveExerciseAsync(1, 1, 1);
+
+            result.Should().BeFalse();
+        }
     }
 }

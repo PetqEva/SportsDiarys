@@ -25,14 +25,16 @@ namespace SportsDiarys.Services.Implementations
 
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                var s = query.Search.Trim();
-                q = q.Where(x => x.Name.Contains(s));
+                var s = query.Search.Trim().ToLower();
+                q = q.Where(x =>
+                    x.Name.ToLower().Contains(s) ||
+                    x.MuscleGroup.ToLower().Contains(s));
             }
 
             if (!string.IsNullOrWhiteSpace(query.MuscleGroup))
             {
-                var mg = query.MuscleGroup.Trim();
-                q = q.Where(x => x.MuscleGroup.Contains(mg));
+                var mg = query.MuscleGroup.Trim().ToLower();
+                q = q.Where(x => x.MuscleGroup.ToLower().Contains(mg));
             }
 
             if (query.Type.HasValue)

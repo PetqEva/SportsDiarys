@@ -472,5 +472,27 @@ namespace SportsDiarys.Tests.Services
             result.TotalCalories.Should().Be(500);
             result.TotalDistanceKm.Should().Be(12);
         }
+
+        [Fact]
+        public async Task ExistsForDateAsync_ShouldIgnoreCurrentDiary_WhenExcludeIdIsPassed()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingDiaryService(context);
+
+            context.TrainingDiaries.Add(new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 1,
+                Date = DateTime.Today,
+                Name = "Test",
+                Place = "Gym"
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.ExistsForDateAsync(1, DateTime.Today, 1);
+
+            result.Should().BeFalse();
+        }
     }
 }

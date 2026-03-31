@@ -1,0 +1,214 @@
+﻿@model SportsDiarys.ViewModels.Progress.ProgressVm
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Прогрес";
+
+    var dailyProgress = Model.DailyProgress ?? new List<SportsDiarys.ViewModels.Progress.DailyProgressVm>();
+
+    var noRecentActivity = !dailyProgress.Any()
+        || dailyProgress.All(x => x.DurationMinutes == 0 && x.Calories == 0 && x.DistanceKm == 0);
+
+    var maxDuration = dailyProgress.Any()
+        ? dailyProgress.Max(x => x.DurationMinutes)
+        : 0;
+}
+<!-- ===================== SUMMARY ===================== -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Общо дневници</h6>
+                <h3>@Model.TotalDiaries</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Общо записи</h6>
+                <h3>@Model.TotalEntries</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Минути (7 дни)</h6>
+                <h3>@Model.Last7DaysDurationMinutes</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Калории (7 дни)</h6>
+                <h3>@Model.Last7DaysCalories</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Минути (30 дни)</h6>
+                <h3>@Model.Last30DaysDurationMinutes</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Калории (30 дни)</h6>
+                <h3>@Model.Last30DaysCalories</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Дистанция (30 дни)</h6>
+                <h3>@Model.Last30DaysDistanceKm.ToString("0.##") km</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== MOST USED SPORT ===================== -->
+@if (!string.IsNullOrWhiteSpace(Model.MostActiveSport))
+{
+    <div class="alert alert-success">
+        Най-често трениран спорт: <strong>@Model.MostActiveSport</strong>
+    </div>
+}
+
+<!-- ===================== NO DATA WARNING ===================== -->
+@if (noRecentActivity)
+{
+    <div class="alert alert-warning">
+        Няма активност през последните 7 дни.
+    </div>
+}
+
+<!-- ===================== TABLE ===================== -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h4 class="mb-3">Последни 7 дни</h4>
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th class="text-end">Минути</th>
+                        <th class="text-end">Калории</th>
+                        <th class="text-end">Км</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var day in dailyProgress)
+                    {
+                        <tr class="@(day.DurationMinutes == maxDuration && maxDuration > 0 ? "table-primary" : "")">
+                            <td>@day.DateLabel</td>
+                            <td class="text-end">@day.DurationMinutes</td>
+                            <td class="text-end">@day.Calories</td>
+                            <td class="text-end">@day.DistanceKm.ToString("0.##")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== CHART ===================== -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h4 class="mb-3">Графика за последните 7 дни</h4>
+        <canvas id="progressChart" height="100"></canvas>
+    </div>
+</div>
+
+<!-- ===================== SPORT BREAKDOWN ===================== -->
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="mb-3">Разпределение по спорт</h4>
+
+        @if (Model.SportBreakdown == null || !Model.SportBreakdown.Any())
+        {
+            <div class="alert alert-info mb-0">
+                Няма достатъчно данни.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Спорт</th>
+                            <th class="text-end">Брой</th>
+                            <th class="text-end">Минути</th>
+                            <th class="text-end">Калории</th>
+                            <th class="text-end">Км</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sport in Model.SportBreakdown)
+                        {
+                            <tr>
+                                <td>@sport.SportName</td>
+                                <td class="text-end">@sport.EntriesCount</td>
+                                <td class="text-end">@sport.TotalDurationMinutes</td>
+                                <td class="text-end">@sport.TotalCalories</td>
+                                <td class="text-end">@sport.TotalDistanceKm.ToString("0.##")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const labels = @Html.Raw(JsonSerializer.Serialize(dailyProgress.Select(x => x.DateLabel)));
+        const durationData = @Html.Raw(JsonSerializer.Serialize(dailyProgress.Select(x => x.DurationMinutes)));
+        const caloriesData = @Html.Raw(JsonSerializer.Serialize(dailyProgress.Select(x => x.Calories)));
+
+        const ctx = document.getElementById('progressChart');
+
+        new Chart(ctx, {
+        type: 'line',
+        data: {
+        labels: labels,
+        datasets: [
+        {
+        label: 'Минути',
+        data: durationData,
+        borderWidth: 2
+        },
+        {
+        label: 'Калории',
+        data: caloriesData,
+        borderWidth: 2
+        }
+        ]
+        },
+        options: {
+        responsive: true,
+        tension: 0.3
+        }
+        });
+    </script>
+}
