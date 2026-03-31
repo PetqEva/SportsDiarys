@@ -150,7 +150,7 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<PagedResultVm<TrainingEntryAllViewModel>> GetMyEntriesPagedAsync(
             int userProfileId,
-            EntriesQueryVm query)
+            EntriesQueryVm? query)
         {
             query ??= new EntriesQueryVm();
 

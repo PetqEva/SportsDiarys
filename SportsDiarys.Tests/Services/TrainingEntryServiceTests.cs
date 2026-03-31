@@ -914,5 +914,81 @@ namespace SportsDiarys.Tests.Services
 
             result.Should().BeFalse();
         }
+
+        [Fact]
+        public async Task GetMyEntriesPagedAsync_ShouldClampPage_WhenPageIsZero()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            var diary = new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 1,
+                Name = "Diary",
+                Date = DateTime.Today,
+                Place = "Gym"
+            };
+
+            context.TrainingDiaries.Add(diary);
+
+            context.TrainingEntries.Add(new TrainingEntry
+            {
+                Id = 1,
+                SportName = "Running",
+                DurationMinutes = 30,
+                Calories = 200,
+                TrainingDiaryId = 1,
+                TrainingDiary = diary
+            });
+
+            await context.SaveChangesAsync();
+
+            var query = new EntriesQueryVm
+            {
+                Page = 0, // <-- невалидна стойност
+                PageSize = 10
+            };
+
+            var result = await service.GetMyEntriesPagedAsync(1, query);
+
+            result.Page.Should().Be(1); // трябва да се коригира на 1
+        }
+
+        [Fact]
+        public async Task GetMyEntriesPagedAsync_ShouldWork_WhenQueryIsNull()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new TrainingEntryService(context);
+
+            var diary = new TrainingDiary
+            {
+                Id = 1,
+                UserProfileId = 1,
+                Name = "Diary",
+                Date = DateTime.Today,
+                Place = "Gym"
+            };
+
+            context.TrainingDiaries.Add(diary);
+
+            context.TrainingEntries.Add(new TrainingEntry
+            {
+                Id = 1,
+                SportName = "Running",
+                DurationMinutes = 30,
+                Calories = 200,
+                TrainingDiaryId = 1,
+                TrainingDiary = diary
+            });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetMyEntriesPagedAsync(1, null);
+
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(1);
+            result.Page.Should().Be(1);
+        }
     }
 }
