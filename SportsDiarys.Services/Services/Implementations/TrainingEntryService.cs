@@ -17,28 +17,56 @@ namespace SportsDiarys.Services.Implementations
             _context = context;
         }
 
-        // ===================== VALIDATION =====================
         public IEnumerable<ValidationError> ValidateBusinessRules(TrainingEntryFormVm vm)
         {
+            if (string.IsNullOrWhiteSpace(vm.SportName))
+            {
+                yield return new ValidationError(
+                    nameof(vm.SportName),
+                    "Името на спорта е задължително.");
+            }
+
             if (vm.DurationMinutes <= 0)
-                yield return new ValidationError(nameof(vm.DurationMinutes), "Продължителността трябва да е положителна.");
+            {
+                yield return new ValidationError(
+                    nameof(vm.DurationMinutes),
+                    "Продължителността трябва да е положителна.");
+            }
 
             if (vm.Calories < 0)
-                yield return new ValidationError(nameof(vm.Calories), "Калориите не могат да са отрицателни.");
+            {
+                yield return new ValidationError(
+                    nameof(vm.Calories),
+                    "Калориите не могат да са отрицателни.");
+            }
 
-            if (string.IsNullOrWhiteSpace(vm.SportName))
-                yield return new ValidationError(nameof(vm.SportName), "Името е задължително.");
+            if (vm.DistanceKm.HasValue && vm.DistanceKm.Value < 0)
+            {
+                yield return new ValidationError(
+                    nameof(vm.DistanceKm),
+                    "Дистанцията не може да е отрицателна.");
+            }
+
+            if (vm.TrainingDiaryId <= 0)
+            {
+                yield return new ValidationError(
+                    nameof(vm.TrainingDiaryId),
+                    "Избери дневник.");
+            }
         }
 
-        // ===================== CREATE =====================
         public async Task<int> CreateAsync(TrainingEntry entry, int userProfileId)
         {
+            ArgumentNullException.ThrowIfNull(entry);
+
             bool ownsDiary = await _context.TrainingDiaries
                 .AnyAsync(d => d.Id == entry.TrainingDiaryId &&
                                d.UserProfileId == userProfileId);
 
             if (!ownsDiary)
-                throw new UnauthorizedAccessException();
+            {
+                throw new UnauthorizedAccessException("Нямаш достъп до този дневник.");
+            }
 
             entry.SportName = entry.SportName.Trim();
 
@@ -48,44 +76,58 @@ namespace SportsDiarys.Services.Implementations
             return entry.Id;
         }
 
-        // ===================== UPDATE =====================
         public async Task<bool> UpdateAsync(TrainingEntry entry, int userProfileId)
         {
-            var existing = await _context.TrainingEntries
-                .Include(e => e.TrainingDiary)
-                .FirstOrDefaultAsync(e => e.Id == entry.Id &&
-                                          e.TrainingDiary.UserProfileId == userProfileId);
+            ArgumentNullException.ThrowIfNull(entry);
 
-            if (existing == null)
+            var existingEntry = await _context.TrainingEntries
+                .Include(e => e.TrainingDiary)
+                .FirstOrDefaultAsync(e =>
+                    e.Id == entry.Id &&
+                    e.TrainingDiary.UserProfileId == userProfileId);
+
+            if (existingEntry == null)
+            {
                 return false;
+            }
 
             bool targetDiaryIsMine = await _context.TrainingDiaries
                 .AnyAsync(d => d.Id == entry.TrainingDiaryId &&
                                d.UserProfileId == userProfileId);
 
             if (!targetDiaryIsMine)
+            {
                 return false;
+            }
 
-            existing.SportName = entry.SportName.Trim();
-            existing.DurationMinutes = entry.DurationMinutes;
-            existing.Calories = entry.Calories;
-            existing.DistanceKm = entry.DistanceKm;
-            existing.TrainingDiaryId = entry.TrainingDiaryId;
+            existingEntry.SportName = entry.SportName.Trim();
+            existingEntry.DurationMinutes = entry.DurationMinutes;
+            existingEntry.Calories = entry.Calories;
+            existingEntry.DistanceKm = entry.DistanceKm;
+            existingEntry.TrainingDiaryId = entry.TrainingDiaryId;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        // ===================== DELETE =====================
         public async Task<bool> DeleteAsync(int entryId, int userProfileId)
         {
             var entry = await _context.TrainingEntries
                 .Include(e => e.TrainingDiary)
-                .FirstOrDefaultAsync(e => e.Id == entryId &&
-                                          e.TrainingDiary.UserProfileId == userProfileId);
+                .Include(e => e.TrainingEntryExercises)
+                .FirstOrDefaultAsync(e =>
+                    e.Id == entryId &&
+                    e.TrainingDiary.UserProfileId == userProfileId);
 
             if (entry == null)
+            {
                 return false;
+            }
+
+            if (entry.TrainingEntryExercises.Any())
+            {
+                _context.TrainingEntryExercises.RemoveRange(entry.TrainingEntryExercises);
+            }
 
             _context.TrainingEntries.Remove(entry);
             await _context.SaveChangesAsync();
@@ -93,7 +135,6 @@ namespace SportsDiarys.Services.Implementations
             return true;
         }
 
-        // ===================== GET ALL =====================
         public async Task<List<TrainingEntry>> GetMyEntriesAsync(int userProfileId)
         {
             return await _context.TrainingEntries
@@ -103,18 +144,20 @@ namespace SportsDiarys.Services.Implementations
                     .ThenInclude(te => te.Exercise)
                 .Where(e => e.TrainingDiary.UserProfileId == userProfileId)
                 .OrderByDescending(e => e.TrainingDiary.Date)
+                .ThenByDescending(e => e.Id)
                 .ToListAsync();
         }
 
-        // ===================== PAGINATION =====================
         public async Task<PagedResultVm<TrainingEntryAllViewModel>> GetMyEntriesPagedAsync(
-    int userProfileId,
-    EntriesQueryVm query)
+            int userProfileId,
+            EntriesQueryVm query)
         {
+            query ??= new EntriesQueryVm();
+
             query.Page = Math.Max(1, query.Page);
             query.PageSize = Math.Clamp(query.PageSize, 5, 50);
 
-            IQueryable<TrainingEntry> q = _context.TrainingEntries
+            IQueryable<TrainingEntry> entriesQuery = _context.TrainingEntries
                 .AsNoTracking()
                 .Include(e => e.TrainingDiary)
                 .Include(e => e.TrainingEntryExercises)
@@ -123,41 +166,61 @@ namespace SportsDiarys.Services.Implementations
 
             if (query.DiaryId.HasValue)
             {
-                q = q.Where(e => e.TrainingDiaryId == query.DiaryId.Value);
+                entriesQuery = entriesQuery.Where(e => e.TrainingDiaryId == query.DiaryId.Value);
             }
 
             if (query.From.HasValue)
             {
-                var fromDate = query.From.Value.Date;
-                q = q.Where(e => e.TrainingDiary.Date >= fromDate);
+                DateTime fromDate = query.From.Value.Date;
+                entriesQuery = entriesQuery.Where(e => e.TrainingDiary.Date >= fromDate);
             }
 
             if (query.To.HasValue)
             {
-                var toDateInclusive = query.To.Value.Date.AddDays(1);
-                q = q.Where(e => e.TrainingDiary.Date < toDateInclusive);
+                DateTime toExclusive = query.To.Value.Date.AddDays(1);
+                entriesQuery = entriesQuery.Where(e => e.TrainingDiary.Date < toExclusive);
             }
 
             if (!string.IsNullOrWhiteSpace(query.Sport))
             {
-                var sport = query.Sport.Trim();
-                q = q.Where(e => e.SportName.Contains(sport));
+                string sport = query.Sport.Trim();
+                entriesQuery = entriesQuery.Where(e => e.SportName.Contains(sport));
             }
 
-            q = query.Sort switch
+            entriesQuery = query.Sort switch
             {
-                "date_asc" => q.OrderBy(e => e.TrainingDiary.Date),
-                "calories_desc" => q.OrderByDescending(e => e.Calories).ThenByDescending(e => e.TrainingDiary.Date),
-                "duration_desc" => q.OrderByDescending(e => e.DurationMinutes).ThenByDescending(e => e.TrainingDiary.Date),
-                "distance_desc" => q.OrderByDescending(e => e.DistanceKm ?? 0).ThenByDescending(e => e.TrainingDiary.Date),
-                _ => q.OrderByDescending(e => e.TrainingDiary.Date)
+                "date_asc" => entriesQuery
+                    .OrderBy(e => e.TrainingDiary.Date)
+                    .ThenBy(e => e.Id),
+
+                "calories_desc" => entriesQuery
+                    .OrderByDescending(e => e.Calories)
+                    .ThenByDescending(e => e.TrainingDiary.Date)
+                    .ThenByDescending(e => e.Id),
+
+                "duration_desc" => entriesQuery
+                    .OrderByDescending(e => e.DurationMinutes)
+                    .ThenByDescending(e => e.TrainingDiary.Date)
+                    .ThenByDescending(e => e.Id),
+
+                "distance_desc" => entriesQuery
+                    .OrderByDescending(e => e.DistanceKm ?? 0)
+                    .ThenByDescending(e => e.TrainingDiary.Date)
+                    .ThenByDescending(e => e.Id),
+
+                _ => entriesQuery
+                    .OrderByDescending(e => e.TrainingDiary.Date)
+                    .ThenByDescending(e => e.Id)
             };
 
-            var total = await q.CountAsync();
+            int totalCount = await entriesQuery.CountAsync();
 
-            var items = await q
+            var dbItems = await entriesQuery
                 .Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
+                .ToListAsync();
+
+            var items = dbItems
                 .Select(e => new TrainingEntryAllViewModel
                 {
                     Id = e.Id,
@@ -168,61 +231,70 @@ namespace SportsDiarys.Services.Implementations
                     TrainingDiaryId = e.TrainingDiaryId,
                     DiaryLabel = e.TrainingDiary.Date.ToString("yyyy-MM-dd"),
                     ExerciseNames = e.TrainingEntryExercises
+                        .Where(x => x.Exercise != null)
                         .Select(x => x.Exercise.Name)
+                        .OrderBy(x => x)
                         .ToList()
                 })
-                .ToListAsync();
+                .ToList();
 
             return new PagedResultVm<TrainingEntryAllViewModel>
             {
                 Items = items,
                 Page = query.Page,
                 PageSize = query.PageSize,
-                TotalCount = total
+                TotalCount = totalCount
             };
         }
 
-        // ===================== DETAILS =====================
         public async Task<TrainingEntryDetailsViewModel?> GetMyEntryDetailsAsync(int entryId, int userProfileId)
         {
-            return await _context.TrainingEntries
+            var entry = await _context.TrainingEntries
                 .AsNoTracking()
                 .Include(e => e.TrainingDiary)
                     .ThenInclude(d => d.UserProfile)
                 .Include(e => e.TrainingEntryExercises)
                     .ThenInclude(te => te.Exercise)
-                .Where(e => e.Id == entryId &&
-                            e.TrainingDiary.UserProfileId == userProfileId)
-                .Select(e => new TrainingEntryDetailsViewModel
-                {
-                    Id = e.Id,
-                    SportName = e.SportName,
-                    DurationMinutes = e.DurationMinutes,
-                    Calories = e.Calories,
-                    DistanceKm = e.DistanceKm,
-                    TrainingDiaryId = e.TrainingDiaryId,
-                    DiaryLabel = e.TrainingDiary.Date.ToString("yyyy-MM-dd"),
-                    DiaryDate = e.TrainingDiary.Date,
-                    UserProfileId = e.TrainingDiary.UserProfileId,
-                    UserName = e.TrainingDiary.UserProfile.Name,
-                    ExerciseNames = e.TrainingEntryExercises
-                        .Select(x => x.Exercise.Name)
-                        .ToList()
-                })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(e =>
+                    e.Id == entryId &&
+                    e.TrainingDiary.UserProfileId == userProfileId);
+
+            if (entry == null)
+            {
+                return null;
+            }
+
+            return new TrainingEntryDetailsViewModel
+            {
+                Id = entry.Id,
+                SportName = entry.SportName,
+                DurationMinutes = entry.DurationMinutes,
+                Calories = entry.Calories,
+                DistanceKm = entry.DistanceKm,
+                TrainingDiaryId = entry.TrainingDiaryId,
+                DiaryLabel = entry.TrainingDiary.Date.ToString("yyyy-MM-dd"),
+                DiaryDate = entry.TrainingDiary.Date,
+                UserProfileId = entry.TrainingDiary.UserProfileId,
+                UserName = entry.TrainingDiary.UserProfile?.Name ?? string.Empty,
+                ExerciseNames = entry.TrainingEntryExercises
+                    .Where(x => x.Exercise != null)
+                    .Select(x => x.Exercise.Name)
+                    .OrderBy(x => x)
+                    .ToList()
+            };
         }
 
-        // ===================== EDIT =====================
         public async Task<TrainingEntry?> GetMyEntryForEditAsync(int entryId, int userProfileId)
         {
             return await _context.TrainingEntries
                 .Include(e => e.TrainingDiary)
                 .Include(e => e.TrainingEntryExercises)
-                .FirstOrDefaultAsync(e => e.Id == entryId &&
-                                          e.TrainingDiary.UserProfileId == userProfileId);
+                .ThenInclude(te => te.Exercise)
+                .FirstOrDefaultAsync(e =>
+                    e.Id == entryId &&
+                    e.TrainingDiary.UserProfileId == userProfileId);
         }
 
-        // ===================== DIARY =====================
         public async Task<bool> DiaryBelongsToMeAsync(int diaryId, int userProfileId)
         {
             return await _context.TrainingDiaries
@@ -232,17 +304,22 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<List<(int Id, string Text)>> GetMyDiarySelectItemsAsync(int userProfileId)
         {
-            return await _context.TrainingDiaries
+            var diaries = await _context.TrainingDiaries
+                .AsNoTracking()
                 .Where(d => d.UserProfileId == userProfileId)
                 .OrderByDescending(d => d.Date)
-                .Select(d => new ValueTuple<int, string>(d.Id, d.Date.ToString("dd.MM.yyyy")))
+                .ThenByDescending(d => d.Id)
                 .ToListAsync();
+
+            return diaries
+                .Select(d => (d.Id, d.Date.ToString("dd.MM.yyyy")))
+                .ToList();
         }
 
-        // ===================== EXERCISES =====================
         public async Task<IEnumerable<(int Id, string Name)>> GetActiveExercisesAsync()
         {
             return await _context.Exercises
+                .AsNoTracking()
                 .Where(e => e.IsActive)
                 .OrderBy(e => e.Name)
                 .Select(e => new ValueTuple<int, string>(e.Id, e.Name))
@@ -251,15 +328,21 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<IEnumerable<EntryExerciseItemVm>> GetEntryExercisesAsync(int entryId, int userProfileId)
         {
-            var isMine = await _context.TrainingEntries
-                .AnyAsync(e => e.Id == entryId &&
-                               e.TrainingDiary.UserProfileId == userProfileId);
+            bool isMine = await _context.TrainingEntries
+                .AnyAsync(e =>
+                    e.Id == entryId &&
+                    e.TrainingDiary.UserProfileId == userProfileId);
 
             if (!isMine)
+            {
                 return Enumerable.Empty<EntryExerciseItemVm>();
+            }
 
             return await _context.TrainingEntryExercises
+                .AsNoTracking()
                 .Where(x => x.TrainingEntryId == entryId)
+                .Include(x => x.Exercise)
+                .OrderBy(x => x.Exercise.Name)
                 .Select(x => new EntryExerciseItemVm
                 {
                     ExerciseId = x.ExerciseId,
@@ -274,30 +357,44 @@ namespace SportsDiarys.Services.Implementations
 
         public async Task<bool> AddExerciseAsync(AddExerciseToEntryVm model, int userProfileId)
         {
-            var entryExists = await _context.TrainingEntries
-                .AnyAsync(e => e.Id == model.TrainingEntryId &&
-                               e.TrainingDiary.UserProfileId == userProfileId);
-
-            if (!entryExists)
-                return false;
+            ArgumentNullException.ThrowIfNull(model);
 
             if (!model.ExerciseId.HasValue)
+            {
                 return false;
+            }
 
-            var exerciseExists = await _context.Exercises
-                .AnyAsync(e => e.Id == model.ExerciseId.Value && e.IsActive);
+            bool entryExistsAndIsMine = await _context.TrainingEntries
+                .AnyAsync(e =>
+                    e.Id == model.TrainingEntryId &&
+                    e.TrainingDiary.UserProfileId == userProfileId);
 
-            if (!exerciseExists)
+            if (!entryExistsAndIsMine)
+            {
                 return false;
+            }
 
-            var already = await _context.TrainingEntryExercises
-                .AnyAsync(x => x.TrainingEntryId == model.TrainingEntryId &&
-                               x.ExerciseId == model.ExerciseId.Value);
+            bool exerciseExistsAndIsActive = await _context.Exercises
+                .AnyAsync(e =>
+                    e.Id == model.ExerciseId.Value &&
+                    e.IsActive);
 
-            if (already)
+            if (!exerciseExistsAndIsActive)
+            {
                 return false;
+            }
 
-            _context.TrainingEntryExercises.Add(new TrainingEntryExercise
+            bool alreadyAdded = await _context.TrainingEntryExercises
+                .AnyAsync(x =>
+                    x.TrainingEntryId == model.TrainingEntryId &&
+                    x.ExerciseId == model.ExerciseId.Value);
+
+            if (alreadyAdded)
+            {
+                return false;
+            }
+
+            var relation = new TrainingEntryExercise
             {
                 TrainingEntryId = model.TrainingEntryId,
                 ExerciseId = model.ExerciseId.Value,
@@ -305,15 +402,17 @@ namespace SportsDiarys.Services.Implementations
                 Reps = model.Reps,
                 WeightKg = model.WeightKg,
                 DurationSeconds = model.DurationSeconds
-            });
+            };
 
+            await _context.TrainingEntryExercises.AddAsync(relation);
             await _context.SaveChangesAsync();
+
             return true;
         }
 
         public async Task<bool> RemoveExerciseAsync(int entryId, int exerciseId, int userProfileId)
         {
-            var entity = await _context.TrainingEntryExercises
+            var relation = await _context.TrainingEntryExercises
                 .Include(x => x.TrainingEntry)
                     .ThenInclude(e => e.TrainingDiary)
                 .FirstOrDefaultAsync(x =>
@@ -321,10 +420,12 @@ namespace SportsDiarys.Services.Implementations
                     x.ExerciseId == exerciseId &&
                     x.TrainingEntry.TrainingDiary.UserProfileId == userProfileId);
 
-            if (entity == null)
+            if (relation == null)
+            {
                 return false;
+            }
 
-            _context.TrainingEntryExercises.Remove(entity);
+            _context.TrainingEntryExercises.Remove(relation);
             await _context.SaveChangesAsync();
 
             return true;

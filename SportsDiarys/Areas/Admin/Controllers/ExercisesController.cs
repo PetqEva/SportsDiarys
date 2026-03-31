@@ -21,7 +21,7 @@ namespace SportsDiarys.Areas.Admin.Controllers
         public async Task<IActionResult> Index([FromQuery] ExerciseQueryVm query)
         {
             query.Page = query.Page < 1 ? 1 : query.Page;
-            query.PageSize = query.PageSize < 1 ? 10 : query.PageSize;
+            query.PageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
 
             var model = await _exerciseService.GetPagedAsync(query);
             ViewBag.Query = query;

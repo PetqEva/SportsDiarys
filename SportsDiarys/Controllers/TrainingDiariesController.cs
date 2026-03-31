@@ -59,7 +59,7 @@ namespace SportsDiarys.Controllers
         {
             var model = new CreateTrainingDiaryViewModel
             {
-                Date = DateTime.Now,
+                Date = DateTime.Today,
                 PlaceOptions = GetPlaceOptions()
             };
 
@@ -92,6 +92,8 @@ namespace SportsDiarys.Controllers
             }
 
             await _service.CreateAsync(model, profileId.Value);
+
+            TempData["Success"] = "Дневникът беше създаден успешно.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -160,6 +162,8 @@ namespace SportsDiarys.Controllers
                 return NotFound();
             }
 
+            TempData["Success"] = "Дневникът беше редактиран успешно.";
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -198,6 +202,8 @@ namespace SportsDiarys.Controllers
             {
                 return NotFound();
             }
+
+            TempData["Success"] = "Дневникът беше изтрит успешно.";
 
             return RedirectToAction(nameof(Index));
         }

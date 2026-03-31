@@ -142,6 +142,8 @@ namespace SportsDiarys.Controllers
 
             await _entryService.CreateAsync(entity, pid);
 
+            TempData["Success"] = "Записът беше създаден успешно.";
+
             if (!string.IsNullOrWhiteSpace(vm.ReturnUrl) && Url.IsLocalUrl(vm.ReturnUrl))
                 return Redirect(vm.ReturnUrl);
 
@@ -213,6 +215,8 @@ namespace SportsDiarys.Controllers
             var updated = await _entryService.UpdateAsync(entity, pid);
             if (!updated) return NotFound();
 
+            TempData["Success"] = "Записът беше редактиран успешно.";
+
             if (!string.IsNullOrWhiteSpace(vm.ReturnUrl) && Url.IsLocalUrl(vm.ReturnUrl))
                 return Redirect(vm.ReturnUrl);
 
@@ -246,6 +250,8 @@ namespace SportsDiarys.Controllers
             var pid = userProfileId.Value;
             var deleted = await _entryService.DeleteAsync(id, pid);
             if (!deleted) return NotFound();
+
+            TempData["Success"] = "Записът беше изтрит успешно.";
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
@@ -319,6 +325,8 @@ namespace SportsDiarys.Controllers
                 return View("Details", pageVm);
             }
 
+            TempData["Success"] = "Упражнението беше добавено успешно.";
+
             return RedirectToAction(nameof(Details), new { id = model.TrainingEntryId, returnUrl });
         }
 
@@ -334,6 +342,8 @@ namespace SportsDiarys.Controllers
 
             if (!removed)
                 return NotFound();
+
+            TempData["Success"] = "Упражнението беше премахнато успешно.";
 
             return RedirectToAction(nameof(Details), new { id = trainingEntryId, returnUrl });
         }
