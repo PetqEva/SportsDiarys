@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data;
 
 namespace SportsDiarys.Tests.Helpers

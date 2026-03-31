@@ -24,12 +24,12 @@ namespace SportsDiarys.Tests.Services
 
             var errors = service.ValidateBusinessRules(vm).ToList();
 
-            errors.Should().HaveCount(3);
+            errors.Should().HaveCount(4);
             errors.Should().Contain(e => e.Field == nameof(vm.SportName));
             errors.Should().Contain(e => e.Field == nameof(vm.DurationMinutes));
             errors.Should().Contain(e => e.Field == nameof(vm.Calories));
+            errors.Should().Contain(e => e.Field == nameof(vm.TrainingDiaryId));
         }
-
         [Fact]
         public async Task CreateAsync_ShouldCreateEntry_WhenDiaryBelongsToUser()
         {
@@ -768,14 +768,17 @@ namespace SportsDiarys.Tests.Services
             var query = new EntriesQueryVm
             {
                 Page = 2,
-                PageSize = 2
+                PageSize = 5
             };
 
             var result = await service.GetMyEntriesPagedAsync(1, query);
 
             result.Should().NotBeNull();
             result.Page.Should().Be(2);
-            result.Items.Should().HaveCount(2);
+            result.PageSize.Should().Be(5);
+            result.TotalCount.Should().Be(6);
+            result.Items.Should().HaveCount(1);
+            result.Items.First().Id.Should().Be(1);
         }
 
         [Fact]
