@@ -1,335 +1,144 @@
-# SportsDiarys
+# 🏋️ SportsDiarys
 
-SportsDiarys is an ASP.NET Core MVC web application for tracking sports activity, training diaries, training entries, exercises, user profiles, calorie targets, and nutrition goals. The project is designed as an individual final project for the ASP.NET Advanced course and demonstrates layered architecture, role-based authorization, Entity Framework Core, validation, seeding, unit testing, and deployment.
-
----
-
-## 1. Project Overview
-
-SportsDiarys helps users organize and monitor their sports activity in a structured way. Registered users can create their own profile, maintain training diaries, add training entries, track exercises, calculate calorie needs, and manage nutrition targets. The application also includes an Administration Area for managing users and exercises.
-
-The main goal of the project is to provide a clean, secure, and practical sports diary system built with modern ASP.NET Core development practices.
+SportsDiarys е ASP.NET Core MVC уеб приложение за проследяване на спортна активност, тренировки и личен прогрес. Проектът е разработен като индивидуален дипломен проект и демонстрира използване на съвременни практики в .NET разработката.
 
 ---
 
-## 2. Main Features
+## 📌 1. Обща информация
 
-### Public / General Features
-- Home page with dashboard overview
-- Custom error pages
-- Responsive user interface
-- Authentication and authorization with ASP.NET Core Identity
+Приложението позволява на потребителите да създават и управляват:
+- тренировъчни дневници
+- тренировъчни записи
+- упражнения
+- хранителни цели
 
-### User Features
-- Register and log in
-- Create and edit personal user profile
-- Create, edit, view, and delete training diaries
-- Create, edit, view, and delete training entries
-- Attach exercises to training entries
-- View diary details and entry details
-- Search and filter records
-- Pagination in list pages
-- Calculate calories and nutrition values
-- Save personal nutrition targets
-
-### Administrator Features
-- Administration Area
-- View system statistics
-- View all users
-- Promote/demote users to administrator
-- Manage exercises
-- Seeded administrator account and roles
+Системата включва и административен панел за управление на упражнения и потребители.
 
 ---
 
-## 3. Application Architecture
+## 🎯 2. Основна цел
 
-The solution follows a layered architecture with separation of concerns.
-
-### Projects / Layers
-- **SportsDiarys** – ASP.NET Core MVC web application (UI layer)
-- **SportsDiarys.Data** – database context, EF Core configuration, and persistence
-- **SportDiary.Data.Models** – entity models
-- **SportsDiarys.Services** – business logic and service layer
-- **SportsDiarys.ViewModels** – view models used by the UI
-- **SportsDiarys.GCommon / Common** – shared constants, roles, validation rules, and common helpers
-- **SportsDiarys.Tests** – unit tests
-
-### Architecture Principles
-- Thin controllers
-- Business logic placed in services
-- Separation between entity models and view models
-- Dependency Injection used throughout the application
-- Clear responsibility boundaries between layers
-- Role-based access control for administrative functionality
+Целта на проекта е да се създаде функционално и сигурно уеб приложение за организиране и анализ на спортна активност, използвайки:
+- ASP.NET Core MVC
+- Entity Framework Core
+- Identity (автентикация и роли)
+- Unit Testing
 
 ---
 
-## 4. Technologies Used
+## ⚙️ 3. Използвани технологии
 
-- **C#**
-- **ASP.NET Core MVC**
-- **.NET 8**
-- **Entity Framework Core**
-- **Microsoft SQL Server**
-- **ASP.NET Core Identity**
-- **Razor Views**
-- **Bootstrap**
-- **xUnit**
-- **FluentAssertions**
-- **EF Core InMemory Provider** for tests
+- ASP.NET Core MVC (.NET 8)
+- Entity Framework Core
+- SQL Server
+- ASP.NET Core Identity
+- Bootstrap 5
+- xUnit (Unit Testing)
+- FluentAssertions
 
 ---
 
-## 5. Database Models
+## 🧱 4. Архитектура
 
-The application uses multiple entity models. The main ones are:
+Проектът е разделен на слоеве:
 
-- **ApplicationUser** – identity user for authentication
-- **UserProfile** – user profile data and personal information
-- **TrainingDiary** – training diary created by a user
-- **TrainingEntry** – entry inside a diary
-- **Exercise** – exercise definition
-- **TrainingEntryExercise** – link table between entries and exercises
-- **NutritionTarget** – personal nutrition targets
-
-This covers the requirement for multiple entity models and demonstrates relational database design with EF Core.
+- **SportsDiarys (Web/UI)** – контролери и изгледи
+- **SportsDiarys.Data** – база данни и модели
+- **SportsDiarys.Services** – бизнес логика
+- **SportsDiarys.ViewModels** – модели за изгледи
+- **SportsDiarys.Tests** – unit тестове
 
 ---
 
-## 6. Main Controllers
+## 🔐 5. Потребители и роли
 
-The application includes multiple controllers, including:
+Системата поддържа:
+- **User** – стандартен потребител
+- **Administrator** – администратор
 
-- **HomeController**
-- **UserProfilesController**
-- **TrainingDiariesController**
-- **TrainingEntriesController**
-- **CalculatorsController**
-- **NutritionTargetsController**
-
-### Admin Area Controllers
-- **AdminController**
-- **ExercisesController** (inside Admin Area)
-
-This covers the requirement for multiple controllers and MVC Areas.
+Администраторът има достъп до:
+- управление на упражнения
+- административен панел
 
 ---
 
-## 7. Identity, Roles, and Authorization
+## 📊 6. Функционалности
 
-The application uses the built-in ASP.NET Core Identity system.
+### 👤 Потребител
+- регистрация и вход
+- създаване на профил
+- създаване на тренировъчни дневници
+- добавяне на тренировъчни записи
+- добавяне на упражнения към записи
+- филтриране и сортиране
+- преглед на статистика
 
-### Roles
-- **User**
-- **Administrator**
-
-### Authorization
-- Authenticated users can manage only their own profiles, diaries, entries, and targets.
-- Administrative functionality is protected with role-based authorization.
-- The Admin Area is accessible only to users in the **Administrator** role.
-
-### Security Rules
-- Ownership checks are applied when editing, viewing, or deleting personal data.
-- Unauthorized users cannot access admin-only pages.
-- User-specific data is isolated by profile and identity checks.
+### ⚙️ Администратор
+- създаване/редакция на упражнения
+- активиране/деактивиране
+- административен dashboard
 
 ---
 
-## 8. Service Layer
+## 🔄 7. Връзки между моделите
 
-The application uses a dedicated service layer to encapsulate business logic.
-
-### Main Services
-- **ITrainingDiaryService / TrainingDiaryService**
-- **ITrainingEntryService / TrainingEntryService**
-- **IExerciseService / ExerciseService**
-- **IUserProfileService / UserProfileService**
-- **IHomeDashboardService / HomeDashboardService**
-- **INutritionTargetService / NutritionTargetService** *(if implemented in the current version)*
-
-### Service Responsibilities
-- Data access orchestration
-- Business rules
-- Filtering and pagination logic
-- Ownership validation
-- Projection to view models
-- CRUD operations
-- Error-safe processing
+- UserProfile → TrainingDiaries (1:N)
+- TrainingDiary → TrainingEntries (1:N)
+- TrainingEntry ↔ Exercise (M:N чрез TrainingEntryExercise)
 
 ---
 
-## 9. User Interface
+## 🧪 8. Тестване
 
-The application uses Razor views and Bootstrap-based responsive design.
+Проектът включва unit тестове за service слоя.
 
-### UI Features
-- Responsive layout
-- Navigation for authenticated and anonymous users
-- Separate Administration Area
-- Search and filter UI
-- Pagination controls
-- Validation messages
-- Confirmation pages for delete operations
-- Error pages for invalid requests and server errors
+Покрити са:
+- CRUD операции
+- validation
+- ownership (сигурност)
+- paging
+- filtering
+- many-to-many връзки
 
-The interface is designed to be clear and easy to use both on desktop and smaller screens.
-
----
-
-## 10. Validation and Security
-
-Validation and security are important parts of the project.
-
-### Validation
-- Required fields
-- String length validation
-- Numeric range validation
-- Server-side validation
-- Client-side validation through Razor and validation scripts
-- ViewModel-based validation
-- Validation constants for reusable rules
-
-### Security
-- ASP.NET Core Identity for authentication
-- Role-based authorization
-- Anti-forgery token protection for POST requests
-- Ownership checks for user data
-- Protection against SQL Injection through EF Core
-- Protection against XSS through Razor HTML encoding
-- Prevention of parameter tampering through server-side checks
+Използва се:
+- InMemory база (EF Core)
+- xUnit
+- FluentAssertions
 
 ---
 
-## 11. Pagination, Search, and Filtering
+## ▶️ 9. Стартиране на проекта
 
-The project includes list pages with pagination and search/filter functionality where appropriate.
-
-### Implemented in modules such as:
-- Training diaries listing
-- Training entries listing
-- Exercise administration pages
-
-This improves usability and satisfies the requirement for pagination and search/filter support.
-
----
-
-## 12. Error Handling
-
-The application includes custom error handling pages.
-
-### Implemented pages
-- **404 Not Found**
-- **500 Internal Server Error / application error page**
-
-Additional error handling is implemented to prevent crashes when invalid input or invalid routes are used.
-
----
-
-## 13. Seeding
-
-The application includes data seeding for initial setup.
-
-### Seeded Data
-- Roles: **User** and **Administrator**
-- Administrator account
-- Initial exercises
-- Sample application data where applicable
-
-### Seeder Components
-- **IdentitySeeder**
-- **DbSeeder**
-
-Seeding helps the project start with usable initial data and demonstrates practical setup of roles and administration.
-
----
-
-## 14. Project Structure
-
-SportsDiarys/
-│
-├── SportsDiarys/                      -> ASP.NET Core MVC application
-├── SportsDiarys.Data/                 -> DbContext, EF Core configuration, migrations
-├── SportDiary.Data.Models/            -> Entity models
-├── SportsDiarys.Services/             -> Interfaces and implementations of services
-├── SportsDiarys.ViewModels/           -> View models used by the UI
-├── SportsDiarys.GCommon/              -> Constants, roles, validation rules
-├── SportsDiarys.Tests/                -> Unit tests
-└── README.md
-
-## 15. How to Run the Project Locally
-
-### 1. Clone the repository
+### 1. Migration и база данни
 ```bash
-git clone https://github.com/PetqEva/SportsDiarys
-cd SportsDiarys
-2. Open the solution
-
-Open SportsDiarys.sln with Visual Studio 2022 or JetBrains Rider.
-
-3. Configure the database
-
-Edit appsettings.json:
-"ConnectionStrings": {
-  "DefaultConnection": "Server=.;Database=SportsDiarysDb;Trusted_Connection=True;TrustServerCertificate=True;"
-}
-4. Apply migrations
 dotnet ef database update
-5. Run the project
+
+### 2. Стартиране
 dotnet run
-6. Unit Tests
 
-The project includes unit tests located in the SportsDiarys.Tests project.
+## 10. Администратор
 
-Tested Services
-TrainingDiaryService
-TrainingEntryService
-ExerciseService
-UserProfileService
-HomeDashboardService
-Tools Used
-xUnit
-FluentAssertions
-EF Core InMemory Database
-Run tests
-dotnet test
-17. Test Coverage
+При първо стартиране се създава администратор чрез seeding.
 
-The business logic in the service layer is covered with unit tests.
+📈 11. Допълнителни функционалности
+Pagination (странициране)
+Filtering (филтриране)
+Sorting (сортиране)
+Validation (валидация)
+TempData съобщения
+Responsive UI
 
-Coverage Target
+🚀 12. Бъдещо развитие
+Графики за прогрес
+Mobile версия
+API интеграция
+Разширени статистики
 
-Minimum required: 65% service layer coverage
+🏁 13. Заключение
 
-Generate coverage
-dotnet test --collect:"XPlat Code Coverage"
-Current coverage
+SportsDiarys демонстрира изграждане на пълноценна ASP.NET Core MVC система с добра архитектура, сигурност, тестове и реална бизнес логика.
 
-Service layer coverage: <PUT YOUR REAL % HERE>
-
-18. Deployment
-Live Application
-
-Live Demo: <PUT YOUR AZURE LINK HERE>
-
-GitHub Repository
-
-https://github.com/PetqEva/SportsDiarys
-
-Notes
-
-The application is deployed using Azure App Service with SQL Server database.
-
-19. Screenshots
-/docs/screenshots/
-
-- home.png
-- dashboard.png
-- admin.png
-
-
-
-
+Проектът покрива всички изисквания за дипломна работа и е разработен с фокус върху практическа приложимост и качество на кода.
 
 
 
