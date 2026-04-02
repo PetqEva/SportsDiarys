@@ -288,72 +288,14 @@ for (i = 0, l = charts.length; i < l; i++) {
 
 var assemblies = [
   {
-    "name": "SportsDiarys.Data",
-    "classes": [
-      { "name": "SportsDiarys.Data.AppDbContext", "rp": "SportsDiarys.Data_AppDbContext.html", "cl": 62, "ucl": 0, "cal": 62, "tl": 83, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Configurations.TrainingDiaryConfiguration", "rp": "SportsDiarys.Data_TrainingDiaryConfiguration.html", "cl": 15, "ucl": 0, "cal": 15, "tl": 34, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Configurations.TrainingEntryConfiguration", "rp": "SportsDiarys.Data_TrainingEntryConfiguration.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 26, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Migrations.AddNutritionTargets", "rp": "SportsDiarys.Data_AddNutritionTargets.html", "cl": 0, "ucl": 571, "cal": 571, "tl": 639, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Migrations.AppDbContextModelSnapshot", "rp": "SportsDiarys.Data_AppDbContextModelSnapshot.html", "cl": 0, "ucl": 550, "cal": 550, "tl": 598, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Migrations.InitialCreate", "rp": "SportsDiarys.Data_InitialCreate.html", "cl": 0, "ucl": 866, "cal": 866, "tl": 969, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-    ]},
-  {
-    "name": "SportsDiarys.Data.Models",
-    "classes": [
-      { "name": "SportsDiarys.Data.Models.ApplicationUser", "rp": "SportsDiarys.Data.Models_ApplicationUser.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 10, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Models.Exercise", "rp": "SportsDiarys.Data.Models_Exercise.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Models.NutritionTarget", "rp": "SportsDiarys.Data.Models_NutritionTarget.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Models.TrainingDiary", "rp": "SportsDiarys.Data.Models_TrainingDiary.html", "cl": 12, "ucl": 0, "cal": 12, "tl": 38, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Models.TrainingEntry", "rp": "SportsDiarys.Data.Models_TrainingEntry.html", "cl": 8, "ucl": 1, "cal": 9, "tl": 38, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Models.TrainingEntryExercise", "rp": "SportsDiarys.Data.Models_TrainingEntryExercise.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 25, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Data.Models.UserProfile", "rp": "SportsDiarys.Data.Models_UserProfile.html", "cl": 11, "ucl": 0, "cal": 11, "tl": 39, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-    ]},
-  {
     "name": "SportsDiarys.Services",
     "classes": [
-      { "name": "SportsDiarys.Services.Implementations.ExerciseService", "rp": "SportsDiarys.Services_ExerciseService.html", "cl": 93, "ucl": 12, "cal": 105, "tl": 148, "cb": 15, "tb": 22, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Services.Implementations.HomeDashboardService", "rp": "SportsDiarys.Services_HomeDashboardService.html", "cl": 0, "ucl": 46, "cal": 46, "tl": 77, "cb": 0, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "SportsDiarys.Services.Implementations.ExerciseService", "rp": "SportsDiarys.Services_ExerciseService.html", "cl": 95, "ucl": 12, "cal": 107, "tl": 150, "cb": 15, "tb": 22, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "SportsDiarys.Services.Implementations.HomeDashboardService", "rp": "SportsDiarys.Services_HomeDashboardService.html", "cl": 46, "ucl": 0, "cal": 46, "tl": 77, "cb": 3, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "SportsDiarys.Services.Implementations.ProgressService", "rp": "SportsDiarys.Services_ProgressService.html", "cl": 79, "ucl": 0, "cal": 79, "tl": 108, "cb": 2, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "SportsDiarys.Services.Implementations.TrainingDiaryService", "rp": "SportsDiarys.Services_TrainingDiaryService.html", "cl": 154, "ucl": 4, "cal": 158, "tl": 214, "cb": 23, "tb": 34, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Services.Implementations.TrainingEntryService", "rp": "SportsDiarys.Services_TrainingEntryService.html", "cl": 188, "ucl": 53, "cal": 241, "tl": 333, "cb": 28, "tb": 42, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.Services.Implementations.UserProfileService", "rp": "SportsDiarys.Services_UserProfileService.html", "cl": 70, "ucl": 1, "cal": 71, "tl": 128, "cb": 20, "tb": 28, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-    ]},
-  {
-    "name": "SportsDiarys.ViewModels",
-    "classes": [
-      { "name": "SportsDiarys.Models.ErrorViewModel", "rp": "SportsDiarys.ViewModels_ErrorViewModel.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Admin.AdminDashboardVm", "rp": "SportsDiarys.ViewModels_AdminDashboardVm.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Admin.UserAdminVm", "rp": "SportsDiarys.ViewModels_UserAdminVm.html", "cl": 0, "ucl": 4, "cal": 4, "tl": 10, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Calculators.TdeeInputVm", "rp": "SportsDiarys.ViewModels_TdeeInputVm.html", "cl": 0, "ucl": 6, "cal": 6, "tl": 38, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Calculators.TdeePageVm", "rp": "SportsDiarys.ViewModels_TdeePageVm.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 8, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Calculators.TdeeResultVm", "rp": "SportsDiarys.ViewModels_TdeeResultVm.html", "cl": 0, "ucl": 9, "cal": 9, "tl": 20, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Common.PagedResult<T>", "rp": "SportsDiarys.ViewModels_PagedResult_1.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 15, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Common.ValidationError", "rp": "SportsDiarys.ViewModels_ValidationError.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 14, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Exercises.ExerciseFormVm", "rp": "SportsDiarys.ViewModels_ExerciseFormVm.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 27, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Exercises.ExerciseListItemVm", "rp": "SportsDiarys.ViewModels_ExerciseListItemVm.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Exercises.ExerciseListVm", "rp": "SportsDiarys.ViewModels_ExerciseListVm.html", "cl": 5, "ucl": 1, "cal": 6, "tl": 18, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Exercises.ExerciseQueryVm", "rp": "SportsDiarys.ViewModels_ExerciseQueryVm.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 14, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Home.HomeDashboardVm", "rp": "SportsDiarys.ViewModels_HomeDashboardVm.html", "cl": 0, "ucl": 14, "cal": 14, "tl": 27, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.Shared.PagedResultVm<T>", "rp": "SportsDiarys.ViewModels_PagedResultVm_1.html", "cl": 4, "ucl": 3, "cal": 7, "tl": 15, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.CreateTrainingDiaryViewModel", "rp": "SportsDiarys.ViewModels_CreateTrainingDiaryViewModel.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 26, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.EditTrainingDiaryViewModel", "rp": "SportsDiarys.ViewModels_EditTrainingDiaryViewModel.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 26, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryAllViewModel", "rp": "SportsDiarys.ViewModels_TrainingDiaryAllViewModel.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryDetailsViewModel", "rp": "SportsDiarys.ViewModels_TrainingDiaryDetailsViewModel.html", "cl": 16, "ucl": 0, "cal": 16, "tl": 29, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryFormViewModel", "rp": "SportsDiarys.ViewModels_TrainingDiaryFormViewModel.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 20, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryFormVm", "rp": "SportsDiarys.ViewModels_TrainingDiaryFormVm.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryListItemVm", "rp": "SportsDiarys.ViewModels_TrainingDiaryListItemVm.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.TrainingDiaryListVm", "rp": "SportsDiarys.ViewModels_TrainingDiaryListVm.html", "cl": 5, "ucl": 0, "cal": 5, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingDiaries.UpdateTrainingDiaryViewModel", "rp": "SportsDiarys.ViewModels_UpdateTrainingDiaryViewModel.html", "cl": 9, "ucl": 0, "cal": 9, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.AddExerciseToEntryVm", "rp": "SportsDiarys.ViewModels_AddExerciseToEntryVm.html", "cl": 7, "ucl": 1, "cal": 8, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.EntriesIndexVm", "rp": "SportsDiarys.ViewModels_EntriesIndexVm.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.EntriesQueryVm", "rp": "SportsDiarys.ViewModels_EntriesQueryVm.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.EntryExerciseItemVm", "rp": "SportsDiarys.ViewModels_EntryExerciseItemVm.html", "cl": 0, "ucl": 6, "cal": 6, "tl": 14, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.TrainingEntryAllViewModel", "rp": "SportsDiarys.ViewModels_TrainingEntryAllViewModel.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.TrainingEntryDetailsPageVm", "rp": "SportsDiarys.ViewModels_TrainingEntryDetailsPageVm.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.TrainingEntryDetailsViewModel", "rp": "SportsDiarys.ViewModels_TrainingEntryDetailsViewModel.html", "cl": 0, "ucl": 11, "cal": 11, "tl": 22, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.TrainingEntries.TrainingEntryFormVm", "rp": "SportsDiarys.ViewModels_TrainingEntryFormVm.html", "cl": 4, "ucl": 4, "cal": 8, "tl": 37, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.UserProfiles.EditUserProfileVm", "rp": "SportsDiarys.ViewModels_EditUserProfileVm.html", "cl": 0, "ucl": 8, "cal": 8, "tl": 32, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.UserProfiles.UserProfileAllViewModel", "rp": "SportsDiarys.ViewModels_UserProfileAllViewModel.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "SportsDiarys.ViewModels.UserProfiles.UserProfileFormViewModel", "rp": "SportsDiarys.ViewModels_UserProfileFormViewModel.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 15, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "SportsDiarys.Services.Implementations.TrainingEntryService", "rp": "SportsDiarys.Services_TrainingEntryService.html", "cl": 265, "ucl": 64, "cal": 329, "tl": 434, "cb": 48, "tb": 58, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "SportsDiarys.Services.Implementations.UserProfileService", "rp": "SportsDiarys.Services_UserProfileService.html", "cl": 71, "ucl": 0, "cal": 71, "tl": 128, "cb": 20, "tb": 28, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
     ]},
 ];
 
@@ -368,10 +310,10 @@ var riskHotspotMetrics = [
 
 var riskHotspots = [
   {
-    "assembly": "SportsDiarys.Services", "class": "SportsDiarys.Services.Implementations.TrainingEntryService", "reportPath": "SportsDiarys.Services_TrainingEntryService.html", "methodName": "GetMyEntriesPagedAsync()", "methodShortName": "GetMyEntriesPagedAsync()", "fileIndex": 0, "line": 113,
+    "assembly": "SportsDiarys.Services", "class": "SportsDiarys.Services.Implementations.TrainingEntryService", "reportPath": "SportsDiarys.Services_TrainingEntryService.html", "methodName": "GetMyEntriesPagedAsync()", "methodShortName": "GetMyEntriesPagedAsync()", "fileIndex": 0, "line": 154,
     "metrics": [
-      { "value": 20, "exceeded": false },
-      { "value": 16, "exceeded": true },
+      { "value": 18, "exceeded": false },
+      { "value": 18, "exceeded": true },
     ]},
 ];
 

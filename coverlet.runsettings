@@ -7,14 +7,16 @@
 
 					<Format>cobertura</Format>
 
+					<!-- ВКЛЮЧВАМЕ САМО SERVICES -->
 					<Include>
 						[SportsDiarys.Services]*
 					</Include>
 
+					<!-- ИЗКЛЮЧВАМЕ ВСИЧКО ДРУГО -->
 					<Exclude>
 						[SportsDiarys]*.Controllers.*
-						[SportsDiarys]*.Areas.*
 						[SportsDiarys]*.Views.*
+						[SportsDiarys]*.Areas.*
 						[SportsDiarys]*.ViewModels.*
 						[SportsDiarys]*.Program
 						[SportsDiarys]*.Startup
@@ -22,25 +24,6 @@
 						[Microsoft.*]*
 						[System.*]*
 					</Exclude>
-
-					<ExcludeByFile>
-						**/Migrations/*.cs
-						**/wwwroot/**
-						**/Views/**
-						**/Areas/**
-						**/Program.cs
-						**/Startup.cs
-					</ExcludeByFile>
-
-					<ExcludeByAttribute>
-						Obsolete
-						GeneratedCodeAttribute
-						CompilerGeneratedAttribute
-						ExcludeFromCodeCoverageAttribute
-					</ExcludeByAttribute>
-
-					<SkipAutoProps>true</SkipAutoProps>
-					<SingleHit>false</SingleHit>
 
 				</Configuration>
 			</DataCollector>

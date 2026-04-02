@@ -197,5 +197,95 @@ namespace SportsDiarys.Tests.Services
                 .Should()
                 .ContainInOrder(6, 5, 4, 3, 2);
         }
+
+        [Fact]
+        public async Task GetDashboardAsync_ShouldIgnoreOtherUsersData()
+        {
+            using var context = TestDbHelper.CreateInMemoryDbContext();
+            var service = new HomeDashboardService(context);
+
+            var myProfile = new UserProfile
+            {
+                IdentityUserId = "user-1",
+                Name = "Mine",
+                Age = 25,
+                Gender = "Female",
+                StartWeightKg = 65,
+                CurrentWeightKg = 63,
+                HeightCm = 170,
+                ActivityLevel = "Medium"
+            };
+
+            var otherProfile = new UserProfile
+            {
+                IdentityUserId = "user-2",
+                Name = "Other",
+                Age = 30,
+                Gender = "Male",
+                StartWeightKg = 80,
+                CurrentWeightKg = 79,
+                HeightCm = 180,
+                ActivityLevel = "High"
+            };
+
+            context.UserProfiles.AddRange(myProfile, otherProfile);
+            await context.SaveChangesAsync();
+
+            var myDiary = new TrainingDiary
+            {
+                UserProfileId = myProfile.Id,
+                Name = "My Diary",
+                Date = DateTime.Today,
+                Place = "Gym",
+                DurationMinutes = 40,
+                WaterLiters = 2,
+                Calories = 200,
+                DistanceKm = 2
+            };
+
+            var otherDiary = new TrainingDiary
+            {
+                UserProfileId = otherProfile.Id,
+                Name = "Other Diary",
+                Date = DateTime.Today,
+                Place = "Park",
+                DurationMinutes = 999,
+                WaterLiters = 9,
+                Calories = 999,
+                DistanceKm = 99
+            };
+
+            context.TrainingDiaries.AddRange(myDiary, otherDiary);
+            await context.SaveChangesAsync();
+
+            context.TrainingEntries.AddRange(
+                new TrainingEntry
+                {
+                    SportName = "Run",
+                    DurationMinutes = 40,
+                    Calories = 200,
+                    DistanceKm = 2,
+                    TrainingDiaryId = myDiary.Id
+                },
+                new TrainingEntry
+                {
+                    SportName = "Swim",
+                    DurationMinutes = 999,
+                    Calories = 999,
+                    DistanceKm = 99,
+                    TrainingDiaryId = otherDiary.Id
+                });
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetDashboardAsync("user-1");
+
+            result.ProfileName.Should().Be("Mine");
+            result.DiariesCount.Should().Be(1);
+            result.EntriesCount.Should().Be(1);
+            result.TotalDurationMinutes.Should().Be(40);
+            result.TotalWaterLiters.Should().Be(2);
+            result.RecentDiaries.Should().HaveCount(1);
+        }
     }
 }

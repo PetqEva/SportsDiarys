@@ -11,6 +11,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="8.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="FluentAssertions" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.23" />
@@ -29,6 +33,11 @@
     <ProjectReference Include="..\SportsDiarys.Services\SportsDiarys.Services.csproj" />
     <ProjectReference Include="..\SportsDiarys.ViewModels\SportsDiarys.ViewModels.csproj" />
 	<ProjectReference Include="..\SportsDiarys.Common\SportsDiarys.Common.csproj" />
+	<ProjectReference Include="..\SportsDiarys\SportsDiarys.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
