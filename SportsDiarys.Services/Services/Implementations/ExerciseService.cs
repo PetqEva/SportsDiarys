@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Models.Enums;
+using SportsDiarys.Data.Models.Enum;
 using SportsDiarys.Services.Interfaces;
 using SportsDiarys.ViewModels.Exercises;
 

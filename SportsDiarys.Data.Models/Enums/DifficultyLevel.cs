@@ -1,9 +1,8 @@
-﻿namespace SportsDiarys.Models.Enums
+﻿namespace SportsDiarys.Data.Models.Enum;
+
+public enum DifficultyLevel
 {
-    public enum DifficultyLevel
-    {
-        Easy = 0,
-        Medium = 1,
-        Hard = 2
-    }
+    Easy = 0,
+    Medium = 1,
+    Hard = 2
 }

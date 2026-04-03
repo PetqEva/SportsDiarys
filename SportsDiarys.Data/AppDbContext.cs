@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Models.Enums;
+using SportsDiarys.Data.Models.Enum;
 
 namespace SportsDiarys.Data
 {

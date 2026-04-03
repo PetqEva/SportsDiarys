@@ -10,8 +10,11 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration.GetConnectionString("AppDbContextConnection")
+    ?? throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' or 'AppDbContextConnection' not found.");
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -35,7 +38,7 @@ builder.Services
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Identity/Account/Login";
+    options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Home/StatusCodeError?code=403";
 });
 

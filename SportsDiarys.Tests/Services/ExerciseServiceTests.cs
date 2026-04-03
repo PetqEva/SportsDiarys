@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using SportsDiarys.Data.Models;
-using SportsDiarys.Models.Enums;
+using SportsDiarys.Data.Models.Enum;
 using SportsDiarys.Services.Implementations;
 using SportsDiarys.Tests.Helpers;
 using SportsDiarys.ViewModels.Exercises;

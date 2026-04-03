@@ -1,4 +1,4 @@
-﻿using SportsDiarys.Models.Enums;
+﻿using SportsDiarys.Data.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 
 namespace SportsDiarys.Data.Models
