@@ -6,6 +6,7 @@ using SportsDiarys.ViewModels.Account;
 
 namespace SportsDiarys.Controllers
 {
+    [Route("[controller]")]
     public class AccountController : Controller
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -23,7 +24,7 @@ namespace SportsDiarys.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("Login")]
         public IActionResult Login(string? returnUrl = null)
         {
             var model = new LoginViewModel
@@ -35,7 +36,7 @@ namespace SportsDiarys.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("Login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -63,7 +64,7 @@ namespace SportsDiarys.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("Register")]
         public IActionResult Register(string? returnUrl = null)
         {
             var model = new RegisterViewModel
@@ -75,7 +76,7 @@ namespace SportsDiarys.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("Register")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -110,7 +111,7 @@ namespace SportsDiarys.Controllers
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("Logout")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
