@@ -1,337 +1,238 @@
 # 🏋️ SportsDiarys
 
-**SportsDiarys** is a full-featured ASP.NET Core MVC web application for tracking sports activity, training diaries, exercises, and personal fitness progress.
+## 📌 Project Overview
 
-The project is developed as a final diploma project and demonstrates modern software engineering practices including layered architecture, clean code, unit testing, and role-based authorization.
+**SportsDiarys** is a web application built with ASP.NET Core MVC that allows users to track their training activities, monitor progress, and manage personal fitness goals.
 
----
-
-# 📌 Project Overview
-
-SportsDiarys allows users to organize and monitor their training routines in a structured and intuitive way.
-
-Each user can:
-- Create and manage personal training diaries
-- Add training entries with detailed metrics
-- Attach exercises to each training entry
-- Track calories, duration, distance, and hydration
-- Analyze activity through a dashboard
-
-The system also includes an **Administration Area** for managing exercises and system data.
+The project demonstrates advanced ASP.NET Core concepts, including layered architecture, dependency injection, Entity Framework Core, Identity authentication, and unit testing.
 
 ---
 
-# 🧱 Architecture
+## 🚀 Features
 
-The application follows a **layered architecture**:
-SportsDiarys
+### 👤 User Features
+
+* User registration and login (ASP.NET Identity)
+* Personal user profile
+* Create and manage training diaries
+* Add training entries (duration, calories, distance, exercises)
+* Track nutrition targets (calories and protein)
+* View progress statistics and summaries
+* TDEE calculator
+
+### 🛠️ Admin Features (Admin Area)
+
+* Manage users
+* Manage exercises (CRUD)
+* Administrative dashboard
+
+### 🔍 Additional Functionality
+
+* Pagination for large datasets
+* Search and filtering
+* Seeded initial data
+* Custom error pages (404 / 500)
+* Responsive UI (Bootstrap)
+
+---
+
+## 🧱 Architecture
+
+The project follows a **layered architecture**:
+
+```
+SportsDiarys (Web)
 │
-├── SportsDiarys (Web Layer)
 ├── SportsDiarys.Services (Business Logic)
-├── SportsDiarys.Data (Data Access)
-├── SportsDiarys.ViewModels (UI Models)
-└── SportsDiarys.Tests (Unit Tests)
+├── SportsDiarys.Data (DbContext, EF Core)
+├── SportsDiarys.Data.Models (Entities)
+├── SportsDiarys.ViewModels (View Models)
+├── SportsDiarys.Common (Constants, Roles)
+├── SportsDiarys.Tests (Unit Tests)
+```
 
-### Key Principles:
-- Separation of concerns
-- Dependency Injection
-- Clean architecture
-- Testability
+### Key Principles
 
----
-
-# ⚙️ Technologies Used
-
-- ASP.NET Core MVC (.NET 8)
-- Entity Framework Core
-- SQL Server
-- ASP.NET Core Identity
-- Bootstrap 5
-- xUnit
-- FluentAssertions
-- InMemory Database (for testing)
+* Separation of concerns
+* Dependency Injection
+* Thin controllers, business logic in services
+* Strong cohesion and loose coupling
 
 ---
 
-# 🔐 Authentication & Authorization
+## 🧰 Technologies Used
 
-- ASP.NET Core Identity is used for user management
-- Role-based authorization:
-  - **User**
-  - **Administrator**
-
-Admin users have access to:
-- Exercise management
-- Admin dashboard
-
----
-
-# 🚀 Main Features
-
-## 👤 User Features
-- Registration and login
-- User profile creation
-- Personal dashboard
-
-## 📓 Training Diaries
-- Create diary per day
-- Track:
-  - Duration
-  - Calories
-  - Water intake
-  - Distance
-  - Notes
-
-## 📊 Training Entries
-- Add multiple entries per diary
-- Filter and search entries
-- Pagination support
-- Sorting (date, calories, duration, distance)
-
-## 🏋️ Exercises
-- Add exercises to entries
-- Track:
-  - Sets
-  - Reps
-  - Weight
-  - Duration
-
-## 📈 Dashboard
-- Total diaries
-- Total entries
-- Total duration
-- Water consumption
-- Recent activities
-
-## ⚙️ Admin Area
-- Manage exercises
-- Activate / deactivate exercises
-- View system statistics
+* ASP.NET Core MVC (.NET 8)
+* Entity Framework Core
+* Microsoft SQL Server
+* ASP.NET Core Identity
+* Razor Views
+* Bootstrap
+* xUnit
+* FluentAssertions
+* InMemory Database (for testing)
 
 ---
 
-# 🧪 Unit Testing
+## 🗄️ Database Models
 
-The project includes **comprehensive unit tests** using:
+Main entities:
 
-- xUnit
-- FluentAssertions
-- EF Core InMemory database
-
-### Coverage:
-- Services layer fully tested
-- Business logic validation
-- CRUD operations
-- Edge cases
-
-### Example tested services:
-- TrainingEntryService
-- ExerciseService
-- TrainingDiaryService
-- HomeDashboardService
+* UserProfile
+* TrainingDiary
+* TrainingEntry
+* Exercise
+* TrainingEntryExercise (many-to-many)
+* NutritionTarget
 
 ---
 
-# 🗄️ Database
+## 🔐 Security and Validation
 
-- Code First approach with Entity Framework Core
-- Relationships:
-  - One-to-Many (Diary → Entries)
-  - Many-to-Many (Entries ↔ Exercises)
+* ASP.NET Identity for authentication and authorization
+* Role-based access (User / Administrator)
+* Anti-forgery protection (`[ValidateAntiForgeryToken]`)
+* Input validation via Data Annotations
+* Protection against:
 
-### Seeding:
-- Default roles (User, Administrator)
-- Admin user
-- Sample exercises
-
----
-
-# 🖥️ UI / UX
-
-- Responsive design with Bootstrap
-- Clean and intuitive interface
-- Notifications using TempData
-- Validation messages
-- Filtering and pagination UI
+  * SQL Injection (via EF Core)
+  * XSS (escaped output)
+  * CSRF
 
 ---
 
-# ▶️ How to Run the Project
+## 🌱 Data Seeding
+
+The application seeds:
+
+* Default roles (User, Administrator)
+* Admin account
+* Sample exercises
+* Demo data for easier testing
+
+---
+
+## 🧪 Unit Tests
+
+* Implemented using **xUnit + FluentAssertions**
+* InMemory database for isolation
+* Covers core business logic (services layer)
+
+👉 **Coverage: ~90% of services layer**
+
+Tested services include:
+
+* TrainingDiaryService
+* TrainingEntryService
+* ExerciseService
+* NutritionTargetService
+* ProgressService
+* UserProfileService
+* HomeDashboardService
+
+---
+
+## ⚙️ How to Run Locally
 
 1. Clone the repository:
-```bash
+
+```
 git clone https://github.com/PetqEva/SportsDiarys
+```
 
-Open in Visual Studio
-Apply migrations:
+2. Open the solution in Visual Studio 2022
 
+3. Update connection string in:
+
+```
+appsettings.json
+```
+
+4. Apply migrations:
+
+```
 Update-Database
+```
 
-Run the project:
+5. Run the project:
 
-Ctrl + F5
-
-Run Tests
-
-dotnet test
-
-Deployment (Optional)
-
-The project can be deployed to:
-
-Azure App Service
-IIS
-Docker (optional)
-🎯 Project Goals
-Build a real-world ASP.NET Core application
-Apply layered architecture
-Implement clean and maintainable code
-Ensure high test coverage
-Demonstrate full-stack development skills
-📚 Conclusion
-
-SportsDiarys is a complete web application that demonstrates:
-
-Strong architectural design
-Clean separation of layers
-Robust business logic
-High-quality unit testing
-Practical real-world functionality
-
-This project reflects a solid understanding of modern ASP.NET Core development and is suitable as a diploma project or professional portfolio entry.
-
-👩‍💻 Author
-
-Petq
-
-📌 License
-
-This project is for educational purposes.
-
-# SportsDiarys
-
-SportsDiarys is an ASP.NET Core MVC web application for tracking sports activity, training diaries, exercises, and personal progress. The project is developed as an individual final assignment for the ASP.NET Advanced course and demonstrates clean architecture, role-based authorization, Entity Framework Core, validation, seeding, unit testing, and responsive UI.
+```
+F5
+```
 
 ---
 
-## 1. Project Overview
+## 🔑 Demo Accounts
 
-The main goal of SportsDiarys is to help users organize and monitor their physical activity in a structured and efficient way. The application allows users to create training diaries, log workouts, track exercises, and analyze progress over time.
+### Admin
 
-The system is built using modern ASP.NET Core practices and follows a layered architecture with separation of concerns.
+* Email: [admin@sportsdiarys.com](mailto:admin@sportsdiarys.com)
+* Password: Admin123!
 
----
+### User
 
-## 2. Features
-
-### Public Features
-- Home page with dashboard overview
-- User authentication (Login / Register)
-- Custom error pages (404 / 500)
-- Responsive UI with Bootstrap
-
-### User Features
-- Create and manage personal profile
-- Create training diaries
-- Add training entries (workouts)
-- Track exercises with sets, reps, weight, and duration
-- Monitor progress and statistics
-- Nutrition target tracking
-- TDEE calculator
-
-### Admin Features
-- Admin dashboard with system statistics
-- Manage users (assign/remove admin role)
-- Manage exercises (CRUD operations)
-- Activate / deactivate exercises
+* Register a new account
 
 ---
 
-## 3. Architecture
+## 🌐 Deployment
 
-The project follows a layered architecture:
+(Optional)
 
-- **SportsDiarys (Web Layer)**  
-  Controllers, Views, UI logic
+The application can be deployed to:
 
-- **SportsDiarys.Services (Business Logic Layer)**  
-  Application logic, validation, business rules
-
-- **SportsDiarys.Data (Data Access Layer)**  
-  DbContext, database configuration, EF Core
-
-- **SportsDiarys.Data.Models (Entities)**  
-  Database models and relationships
-
-- **SportsDiarys.ViewModels**  
-  Models used for UI communication
-
-- **SportsDiarys.Common**  
-  Shared constants and helpers
-
-- **SportsDiarys.Tests**  
-  Unit tests for services and controllers
-
-This structure ensures **loose coupling and high cohesion**.
+* Azure App Service
+* Azure SQL Database
 
 ---
 
-## 4. Technologies
+## 📸 Screenshots
 
-- ASP.NET Core MVC (.NET 8)
-- Entity Framework Core
-- Microsoft SQL Server
-- ASP.NET Core Identity
-- Razor Views
-- Bootstrap
-- xUnit
-- FluentAssertions
+*(Optional – add screenshots here)*
 
 ---
 
-## 5. Database & Entity Models
+## 🎥 Demo Video
 
-The application includes multiple entity models:
-
-- UserProfile
-- TrainingDiary
-- TrainingEntry
-- Exercise
-- TrainingEntryExercise (Many-to-Many)
-- NutritionTarget
-
-Relationships are implemented using Entity Framework Core with proper configuration.
+*(Optional – add link to video presentation)*
 
 ---
 
-## 6. Authentication & Authorization
+## 📊 GitHub Repository
 
-The application uses ASP.NET Core Identity.
+* Public repository with full history
+* 30+ commits across multiple days
+* Logical commit structure
 
-### Roles:
-- **User**
-- **Administrator**
-
-Authorization is implemented using:
-- `[Authorize]`
-- `[Authorize(Roles = "Administrator")]`
+👉 https://github.com/PetqEva/SportsDiarys
 
 ---
 
-## 7. Validation & Security
+## ✅ Requirements Coverage
 
-The project implements:
+This project fulfills all ASP.NET Advanced course requirements:
 
-- Server-side validation (Data Annotations)
-- Client-side validation
-- Anti-forgery protection (`[ValidateAntiForgeryToken]`)
-- Protection against:
-  - SQL Injection (via EF Core)
-  - XSS (Razor encoding)
-  - CSRF
+* ✔ 10+ views
+* ✔ 5+ controllers
+* ✔ 5+ entity models
+* ✔ MVC + Razor
+* ✔ EF Core + SQL Server
+* ✔ Identity + roles
+* ✔ Admin Area
+* ✔ Pagination + search
+* ✔ Unit testing (65%+ coverage)
+* ✔ Error handling (404 / 500)
+* ✔ Validation and security
+* ✔ Clean architecture
+* ✔ GitHub with proper history
+* ✔ Full documentation
 
 ---
 
-## 8. Admin Area
+## ⭐ Conclusion
 
-Admin functionality is separated using **MVC Areas**:
+SportsDiarys demonstrates a complete, well-structured ASP.NET Core MVC application with real-world functionality, strong architecture, and high test coverage.
+
+---
+
+© 2026 SportsDiarys

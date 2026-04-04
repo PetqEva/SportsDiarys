@@ -1,5 +1,5 @@
 ﻿@{
-    var code = ViewData["ErrorCode"] as int? ?? 0;
+    var code = ViewData["ErrorCode"] as int? ?? 500;
 
     ViewData["Title"] = code switch
     {
@@ -14,14 +14,24 @@
         404 => "Страницата, която търсиш, не беше намерена.",
         403 => "Нямаш права за достъп до този ресурс.",
         500 => "Възникна вътрешна грешка в сървъра.",
-        _ => "Възникна неочаквана грешка."
+        _ => "Възникна неочаквана грешка. Моля, опитай отново по-късно."
     };
 }
 
+@* SEO: да не се индексират error страниците *@
+<meta name="robots" content="noindex" />
+
 <div class="container py-5 text-center">
-    <h1 class="display-4 text-danger">@code</h1>
+    <h1 class="display-3 text-danger mb-3">@code</h1>
     <h2 class="mb-3">@ViewData["Title"]</h2>
-    <p class="text-muted">@message</p>
+
+    <p class="text-muted">
+        @message
+    </p>
+
+    <p class="text-muted small">
+        Възможно е адресът да е грешен или страницата да е премахната.
+    </p>
 
     <div class="mt-4">
         <a asp-controller="Home" asp-action="Index" class="btn btn-primary me-2">

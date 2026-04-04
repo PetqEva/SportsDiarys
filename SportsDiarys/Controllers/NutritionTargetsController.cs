@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SportsDiarys.Data;
 using SportsDiarys.Data.Models;
+using SportsDiarys.Services.Interfaces;
 
 namespace SportsDiarys.Controllers
 {
     [Authorize]
     public class NutritionTargetsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly INutritionTargetService _nutritionTargetService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public NutritionTargetsController(
-            AppDbContext context,
+            INutritionTargetService nutritionTargetService,
             UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _nutritionTargetService = nutritionTargetService;
             _userManager = userManager;
         }
 
@@ -31,30 +30,16 @@ namespace SportsDiarys.Controllers
                 return Challenge();
             }
 
-            var existing = await _context.NutritionTargets
-                .FirstOrDefaultAsync(x => x.UserId == user.Id);
-
-            if (existing == null)
+            try
             {
-                var target = new NutritionTarget
-                {
-                    UserId = user.Id,
-                    Calories = (int)Math.Round(calories),
-                    ProteinGrams = (int)Math.Round(proteinGrams)
-                };
-
-                _context.NutritionTargets.Add(target);
+                await _nutritionTargetService.SaveAsync(user.Id, calories, proteinGrams);
+                TempData["SuccessMessage"] = "Целта е запазена успешно!";
             }
-            else
+            catch (ArgumentException ex)
             {
-                existing.Calories = (int)Math.Round(calories);
-                existing.ProteinGrams = (int)Math.Round(proteinGrams);
-                existing.CreatedOn = DateTime.UtcNow;
+                TempData["ErrorMessage"] = ex.Message;
             }
 
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Целта е запазена успешно!";
             return RedirectToAction("Tdee", "Calculators");
         }
     }

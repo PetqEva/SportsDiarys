@@ -50,6 +50,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IHomeDashboardService, HomeDashboardService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
+builder.Services.AddScoped<INutritionTargetService, NutritionTargetService>();
 
 var app = builder.Build();
 
