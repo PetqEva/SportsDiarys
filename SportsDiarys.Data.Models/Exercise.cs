@@ -11,7 +11,7 @@ namespace SportsDiarys.Data.Models
         public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(40)]
-        public string MuscleGroup { get; set; } = string.Empty; // e.g. Chest, Back, Legs
+        public string MuscleGroup { get; set; } = string.Empty;
 
         [MaxLength(400)]
         public string? Description { get; set; }
@@ -22,7 +22,10 @@ namespace SportsDiarys.Data.Models
 
         public bool IsActive { get; set; } = true;
 
-        // Навигационно свойство към TrainingEntryExercise (много към много)
+        // ✅ NEW
+        [MaxLength(255)]
+        public string? ImagePath { get; set; }
+
         public ICollection<TrainingEntryExercise> TrainingEntryExercises { get; set; } = new List<TrainingEntryExercise>();
     }
 }

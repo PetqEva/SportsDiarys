@@ -66,7 +66,8 @@ namespace SportsDiarys.Services.Implementations
                     MuscleGroup = x.MuscleGroup,
                     Type = x.Type.ToString(),
                     Difficulty = x.Difficulty.ToString(),
-                    IsActive = x.IsActive
+                    IsActive = x.IsActive,
+                    ImagePath = x.ImagePath
                 })
                 .ToListAsync();
 
@@ -92,14 +93,14 @@ namespace SportsDiarys.Services.Implementations
                     Description = x.Description,
                     Difficulty = (int)x.Difficulty,
                     Type = (int)x.Type,
-                    IsActive = x.IsActive
+                    IsActive = x.IsActive,
+                    ImagePath = x.ImagePath
                 })
                 .FirstOrDefaultAsync();
         }
 
         public async Task<int> CreateAsync(ExerciseFormVm model)
         {
-            // нормализация (проста, но полезна)
             var name = model.Name.Trim();
             var mg = model.MuscleGroup.Trim();
 
@@ -110,7 +111,8 @@ namespace SportsDiarys.Services.Implementations
                 Description = string.IsNullOrWhiteSpace(model.Description) ? null : model.Description.Trim(),
                 Difficulty = (DifficultyLevel)model.Difficulty,
                 Type = (ExerciseType)model.Type,
-                IsActive = model.IsActive
+                IsActive = model.IsActive,
+                ImagePath = model.ImagePath
             };
 
             _context.Exercises.Add(entity);
@@ -129,6 +131,11 @@ namespace SportsDiarys.Services.Implementations
             entity.Difficulty = (DifficultyLevel)model.Difficulty;
             entity.Type = (ExerciseType)model.Type;
             entity.IsActive = model.IsActive;
+
+            if (!string.IsNullOrWhiteSpace(model.ImagePath))
+            {
+                entity.ImagePath = model.ImagePath;
+            }
 
             await _context.SaveChangesAsync();
             return true;

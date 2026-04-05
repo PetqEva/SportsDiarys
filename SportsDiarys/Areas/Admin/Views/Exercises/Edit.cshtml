@@ -1,59 +1,75 @@
-﻿@model SportsDiarys.ViewModels.Exercises.ExerciseFormVm
+﻿@using SportsDiarys.ViewModels.Exercises
+@model ExerciseFormVm
 
 @{
-    ViewData["Title"] = "Редакция на упражнение";
+    ViewData["Title"] = "Edit Exercise";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<div class="container mt-4">
+    <h2>Edit Exercise</h2>
+    <hr />
 
-<form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken()
-    <input asp-for="Id" type="hidden" />
+    <form method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
 
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="ImagePath" type="hidden" />
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="MuscleGroup" class="form-label"></label>
-        <input asp-for="MuscleGroup" class="form-control" />
-        <span asp-validation-for="MuscleGroup" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label asp-for="MuscleGroup" class="form-label"></label>
+            <input asp-for="MuscleGroup" class="form-control" />
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="Difficulty" class="form-label"></label>
-        <select asp-for="Difficulty" class="form-select">
-            <option value="0">Лесно</option>
-            <option value="1">Средно</option>
-            <option value="2">Трудно</option>
-        </select>
-        <span asp-validation-for="Difficulty" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label asp-for="Difficulty" class="form-label"></label>
+            <select asp-for="Difficulty" class="form-select">
+                <option value="0">Easy</option>
+                <option value="1">Medium</option>
+                <option value="2">Hard</option>
+            </select>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="Type" class="form-label"></label>
-        <select asp-for="Type" class="form-select">
-            <option value="0">Силово</option>
-            <option value="1">Кардио</option>
-            <option value="2">Друго</option>
-        </select>
-        <span asp-validation-for="Type" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label asp-for="Type" class="form-label"></label>
+            <select asp-for="Type" class="form-select">
+                <option value="0">Strength</option>
+                <option value="1">Cardio</option>
+                <option value="2">Mobility</option>
+            </select>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Запази</button>
-    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
-</form>
+        <div class="mb-3 form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+        <div class="mb-3">
+            <label asp-for="ImageFile" class="form-label">Снимка</label>
+            <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/*" />
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+        {
+            <div class="mb-3">
+                <label class="form-label d-block">Текуща снимка</label>
+                <img src="@Model.ImagePath" alt="@Model.Name" style="width:180px;height:180px;object-fit:cover;border-radius:10px;" />
+            </div>
+        }
+
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-controller="Exercises" asp-action="Index">Back</a>
+        </div>
+    </form>
+</div>

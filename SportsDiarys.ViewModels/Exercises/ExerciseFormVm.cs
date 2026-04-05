@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace SportsDiarys.ViewModels.Exercises
 {
@@ -6,22 +7,25 @@ namespace SportsDiarys.ViewModels.Exercises
     {
         public int Id { get; set; }
 
-        [Required, StringLength(60, MinimumLength = 2)]
+        [Required]
+        [StringLength(60)]
         public string Name { get; set; } = string.Empty;
 
-        [Required, StringLength(40, MinimumLength = 2)]
+        [Required]
+        [StringLength(40)]
         public string MuscleGroup { get; set; } = string.Empty;
 
         [StringLength(400)]
         public string? Description { get; set; }
 
-        // enum as int (лесно за dropdown)
-        [Range(0, 2)]
-        public int Difficulty { get; set; } = 1;
+        public int Difficulty { get; set; }
 
-        [Range(0, 2)]
-        public int Type { get; set; } = 0;
+        public int Type { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public string? ImagePath { get; set; }
+
+        public IFormFile? ImageFile { get; set; }
     }
 }

@@ -1,7 +1,11 @@
 ﻿@using SportsDiarys.ViewModels.Exercises
 @model ExerciseFormVm
 
+<input asp-for="Id" type="hidden" />
+<input asp-for="ImagePath" type="hidden" />
+
 <div class="row g-3">
+
     <div class="col-md-6">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" />
@@ -46,6 +50,25 @@
             <label class="form-check-label" asp-for="IsActive">Active</label>
         </div>
     </div>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="col-md-6">
+        <label asp-for="ImageFile" class="form-label">Снимка</label>
+        <input asp-for="ImageFile"
+               type="file"
+               class="form-control"
+               accept=".jpg,.jpeg,.png,.webp,image/*" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+    {
+        <div class="col-md-6">
+            <label class="form-label d-block">Текуща снимка</label>
+            <img src="@Model.ImagePath"
+                 alt="@Model.Name"
+                 style="width:180px;height:180px;object-fit:cover;border-radius:10px;" />
+        </div>
+    }
+
 </div>
-
-

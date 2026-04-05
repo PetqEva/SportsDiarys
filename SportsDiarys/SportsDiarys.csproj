@@ -27,4 +27,8 @@
     <ProjectReference Include="..\SportsDiarys.ViewModels\SportsDiarys.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\exercises\" />
+  </ItemGroup>
+
 </Project>

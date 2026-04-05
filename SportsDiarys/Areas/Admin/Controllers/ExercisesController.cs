@@ -11,10 +11,14 @@ namespace SportsDiarys.Areas.Admin.Controllers
     public class ExercisesController : Controller
     {
         private readonly IExerciseService _exerciseService;
+        private readonly IWebHostEnvironment _environment;
 
-        public ExercisesController(IExerciseService exerciseService)
+        public ExercisesController(
+            IExerciseService exerciseService,
+            IWebHostEnvironment environment)
         {
             _exerciseService = exerciseService;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -40,9 +44,16 @@ namespace SportsDiarys.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ExerciseFormVm model)
         {
+            ValidateImage(model.ImageFile);
+
             if (!ModelState.IsValid)
             {
                 return View(model);
+            }
+
+            if (model.ImageFile != null)
+            {
+                model.ImagePath = await SaveImageAsync(model.ImageFile);
             }
 
             var id = await _exerciseService.CreateAsync(model);
@@ -72,9 +83,16 @@ namespace SportsDiarys.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ExerciseFormVm model)
         {
+            ValidateImage(model.ImageFile);
+
             if (!ModelState.IsValid)
             {
                 return View(model);
+            }
+
+            if (model.ImageFile != null)
+            {
+                model.ImagePath = await SaveImageAsync(model.ImageFile);
             }
 
             var success = await _exerciseService.UpdateAsync(model);
@@ -107,6 +125,44 @@ namespace SportsDiarys.Areas.Admin.Controllers
                 : "Упражнението беше деактивирано.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private void ValidateImage(IFormFile? imageFile)
+        {
+            if (imageFile == null)
+            {
+                return;
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(nameof(ExerciseFormVm.ImageFile),
+                    "Моля, качете валидно изображение (.jpg, .jpeg, .png, .webp).");
+            }
+
+            if (imageFile.Length > 2 * 1024 * 1024)
+            {
+                ModelState.AddModelError(nameof(ExerciseFormVm.ImageFile),
+                    "Снимката трябва да бъде до 2 MB.");
+            }
+        }
+
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        {
+            var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "exercises");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            var fileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await imageFile.CopyToAsync(stream);
+
+            return $"/images/exercises/{fileName}";
         }
     }
 }
