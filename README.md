@@ -2,9 +2,9 @@
 
 ## 📌 Project Overview
 
-**SportsDiarys** is a web application built with ASP.NET Core MVC that allows users to track their training activities, monitor progress, and manage personal fitness goals.
+**SportsDiarys** is a full-stack ASP.NET Core MVC web application designed for tracking training activities, monitoring fitness progress, and managing personal health goals.
 
-The project demonstrates advanced ASP.NET Core concepts, including layered architecture, dependency injection, Entity Framework Core, Identity authentication, and unit testing.
+The project demonstrates advanced ASP.NET Core concepts including layered architecture, dependency injection, Entity Framework Core, Identity-based authentication, role management, and unit testing.
 
 ---
 
@@ -12,27 +12,34 @@ The project demonstrates advanced ASP.NET Core concepts, including layered archi
 
 ### 👤 User Features
 
-* User registration and login (ASP.NET Identity)
+* User registration and authentication (ASP.NET Core Identity)
 * Personal user profile
-* Create and manage training diaries
-* Add training entries (duration, calories, distance, exercises)
+* Create, edit, and delete training diaries
+* Add training entries (duration, calories, distance)
+* Attach exercises to training entries (sets, reps, weight)
 * Track nutrition targets (calories and protein)
 * View progress statistics and summaries
-* TDEE calculator
+* TDEE (Total Daily Energy Expenditure) calculator
+
+---
 
 ### 🛠️ Admin Features (Admin Area)
 
-* Manage users
-* Manage exercises (CRUD)
 * Administrative dashboard
+* Manage users
+* Manage exercises (CRUD operations)
+* Role-based access control
+
+---
 
 ### 🔍 Additional Functionality
 
 * Pagination for large datasets
-* Search and filtering
+* Search and filtering capabilities
 * Seeded initial data
-* Custom error pages (404 / 500)
+* Custom error pages (404, 403, 500)
 * Responsive UI (Bootstrap)
+* Clean and user-friendly interface
 
 ---
 
@@ -43,20 +50,21 @@ The project follows a **layered architecture**:
 ```
 SportsDiarys (Web)
 │
-├── SportsDiarys.Services (Business Logic)
-├── SportsDiarys.Data (DbContext, EF Core)
-├── SportsDiarys.Data.Models (Entities)
-├── SportsDiarys.ViewModels (View Models)
-├── SportsDiarys.Common (Constants, Roles)
-├── SportsDiarys.Tests (Unit Tests)
+├── SportsDiarys.Services        (Business Logic)
+├── SportsDiarys.Data            (DbContext, EF Core)
+├── SportsDiarys.Data.Models     (Entities)
+├── SportsDiarys.ViewModels      (View Models)
+├── SportsDiarys.Common          (Constants, Roles)
+├── SportsDiarys.Tests           (Unit Tests)
 ```
 
 ### Key Principles
 
 * Separation of concerns
 * Dependency Injection
-* Thin controllers, business logic in services
+* Thin controllers (logic moved to services)
 * Strong cohesion and loose coupling
+* Clean and maintainable code
 
 ---
 
@@ -97,7 +105,7 @@ Main entities:
 
   * SQL Injection (via EF Core)
   * XSS (escaped output)
-  * CSRF
+  * CSRF (anti-forgery tokens)
 
 ---
 
@@ -118,9 +126,9 @@ The application seeds:
 * InMemory database for isolation
 * Covers core business logic (services layer)
 
-👉 **Coverage: ~90% of services layer**
+**Coverage:** ~90% of services layer
 
-Tested services include:
+Tested services:
 
 * TrainingDiaryService
 * TrainingEntryService
@@ -142,10 +150,16 @@ git clone https://github.com/PetqEva/SportsDiarys
 
 2. Open the solution in Visual Studio 2022
 
-3. Update connection string in:
+3. Configure your database connection using **User Secrets** or environment variables
 
-```
-appsettings.json
+Example connection string:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.;Database=SportsDiarysDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
+  }
+}
 ```
 
 4. Apply migrations:
@@ -160,49 +174,44 @@ Update-Database
 F5
 ```
 
+> ⚠️ Sensitive credentials are NOT stored in the repository.
+> Use local secrets or environment variables for database configuration.
+
 ---
 
 ## 🔑 Demo Accounts
 
 ### Admin
 
-* Email: [admin@sportsdiarys.com](mailto:admin@sportsdiarys.com)
+* Email: [admin@sportdiary.bg](mailto:admin@sportdiary.bg)
 * Password: Admin123!
 
 ### User
 
-* Register a new account
+* Register a new account through the application
 
 ---
 
 ## 🌐 Deployment
-
-(Optional)
 
 The application can be deployed to:
 
 * Azure App Service
 * Azure SQL Database
 
----
+Typical deployment steps:
 
-## 📸 Screenshots
-
-*(Optional – add screenshots here)*
-
----
-
-## 🎥 Demo Video
-
-*(Optional – add link to video presentation)*
+1. Publish the project to Azure App Service
+2. Configure connection string in Azure App Settings
+3. Run migrations on the production database
 
 ---
 
 ## 📊 GitHub Repository
 
-* Public repository with full history
-* 30+ commits across multiple days
-* Logical commit structure
+* Public repository with consistent development history
+* 40+ commits across multiple days
+* Clear and descriptive commit messages
 
 👉 https://github.com/PetqEva/SportsDiarys
 
@@ -212,26 +221,29 @@ The application can be deployed to:
 
 This project fulfills all ASP.NET Advanced course requirements:
 
+* ✔ ASP.NET Core MVC application (.NET 6+)
 * ✔ 10+ views
 * ✔ 5+ controllers
 * ✔ 5+ entity models
 * ✔ MVC + Razor
-* ✔ EF Core + SQL Server
-* ✔ Identity + roles
+* ✔ Entity Framework Core + SQL Server
+* ✔ ASP.NET Identity + roles
 * ✔ Admin Area
-* ✔ Pagination + search
+* ✔ Pagination, search, and filtering
 * ✔ Unit testing (65%+ coverage)
 * ✔ Error handling (404 / 500)
-* ✔ Validation and security
-* ✔ Clean architecture
-* ✔ GitHub with proper history
-* ✔ Full documentation
+* ✔ Security and validation
+* ✔ Layered architecture and SOLID principles
+* ✔ GitHub repository with proper history
+* ✔ Full project documentation
 
 ---
 
 ## ⭐ Conclusion
 
-SportsDiarys demonstrates a complete, well-structured ASP.NET Core MVC application with real-world functionality, strong architecture, and high test coverage.
+SportsDiarys is a complete, production-ready ASP.NET Core MVC application that demonstrates real-world functionality, clean architecture, strong separation of concerns, and high test coverage.
+
+The project follows best practices for modern web development and meets all requirements for the ASP.NET Advanced course.
 
 ---
 

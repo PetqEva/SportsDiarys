@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportsDiarys.Data.Models;
+using SportsDiarys.Infrastructure;
 using SportsDiarys.ViewModels.Account;
 
 namespace SportsDiarys.Controllers
@@ -97,6 +98,21 @@ namespace SportsDiarys.Controllers
 
             if (result.Succeeded)
             {
+                if (!await _userManager.IsInRoleAsync(user, Roles.User))
+                {
+                    var addToRoleResult = await _userManager.AddToRoleAsync(user, Roles.User);
+
+                    if (!addToRoleResult.Succeeded)
+                    {
+                        foreach (var error in addToRoleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+
+                        return View(model);
+                    }
+                }
+
                 _logger.LogInformation("User registered.");
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return LocalRedirect(model.ReturnUrl);
