@@ -12,6 +12,23 @@ The project demonstrates advanced ASP.NET Core concepts including layered archit
 
 ### 👤 User Features
 
+### 🏠 Home Dashboard
+![Home](screenshots/home.png)
+
+### 🛠️ Admin Panel (Exercises Management)
+![Admin](screenshots/admin.png)
+
+### 🔥 TDEE Calculator
+![TDEE](screenshots/tdee.png)
+
+### 📊 Progress & Statistics
+![Progress](screenshots/progress.png)
+
+### ⚠️ Error Handling (404 Page)
+![404](screenshots/404.png)
+
+### 👤 User Features
+
 * User registration and authentication (ASP.NET Core Identity)
 * Personal user profile
 * Create, edit, and delete training diaries
